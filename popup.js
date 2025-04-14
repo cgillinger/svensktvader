@@ -132,6 +132,11 @@ function loadSavedSettings() {
     const savedApiKey = result[STORAGE_KEYS.API_KEY];
     if (savedApiKey) {
       apiKeyInput.value = savedApiKey;
+      // Uppdatera API-nyckelstatus till "Använder exakta soltider"
+      updateApiKeyStatus(savedApiKey);
+    } else {
+      // Säkerställ att status visar "Använder förenklad beräkning" om ingen nyckel finns
+      updateApiKeyStatus('');
     }
     
     // Ladda vindskala
@@ -140,6 +145,27 @@ function loadSavedSettings() {
   });
 }
 
+/**
+ * Uppdaterar status för API-nyckeln i UI
+ * @param {string} apiKey - API-nyckeln att validera
+ */
+function updateApiKeyStatus(apiKey) {
+  const apiKeyStatus = document.getElementById('api-key-status');
+  const apiKeyIcon = document.getElementById('api-key-icon');
+  const apiKeyMessage = document.getElementById('api-key-message');
+  
+  if (!apiKey || apiKey.length < 10) {
+    // Ingen eller för kort API-nyckel
+    apiKeyStatus.className = 'api-key-status';
+    apiKeyIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+    apiKeyMessage.textContent = 'Soldata: Använder förenklad beräkning';
+  } else {
+    // API-nyckel finns - anta att den är giltig
+    apiKeyStatus.className = 'api-key-status valid';
+    apiKeyIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+    apiKeyMessage.textContent = 'Soldata: Använder exakta soltider';
+  }
+}
 /**
  * Öppnar inställningspanelen
  */
@@ -168,6 +194,9 @@ function saveSettings() {
     [STORAGE_KEYS.API_KEY]: apiKey,
     [STORAGE_KEYS.WIND_SCALE]: selectedWindScale
   });
+  
+  // Uppdatera API-nyckelstatus
+  updateApiKeyStatus(apiKey);
   
   // Uppdatera väderdata med nya inställningar
   loadWeatherData();
@@ -314,7 +343,6 @@ async function processWeatherData(data) {
   const now = new Date();
   lastUpdatedSpan.textContent = formatTime(now);
 }
-
 /**
  * Uppdaterar lufttrycksdisplayen baserat på hämtad data
  * @param {Object} pressureData - Objekt med lufttrycksdata

@@ -74,19 +74,24 @@
             </div>
           </div>
           
-          <!-- Lufttryckspanel -->
-          <div class="detail pressure-detail">
-            <div class="detail-icon">
-              <i class="wi wi-barometer"></i>
+          <!-- ÄNDRAT: Lufttryckspanel ändrad till tvåspaltsformat -->
+          <div class="detail pressure-detail two-column-detail">
+            <div class="pressure-left">
+              <div class="detail-icon">
+                <i class="wi wi-barometer"></i>
+              </div>
+              <div class="detail-info">
+                <div class="detail-label">Lufttryck</div>
+                <div class="detail-value" id="pressure-value">-- hPa</div>
+              </div>
             </div>
-            <div class="detail-info">
-              <div class="detail-label">Lufttryck</div>
-              <div class="detail-value">
-                <span id="pressure-value">-- hPa</span>
-                <span class="trend-indicator">
+            <div class="pressure-right">
+              <div class="trend-container">
+                <div class="trend-label">Trend</div>
+                <div class="trend-value">
                   <i id="pressure-trend-icon" class="wi wi-direction-right"></i>
                   <span id="pressure-trend">Stabilt</span>
-                </span>
+                </div>
               </div>
             </div>
           </div>

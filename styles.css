@@ -170,6 +170,58 @@ h3 {
   transform: translateY(-2px);
 }
 
+/* NYTT: Tvåspaltig detalj */
+.two-column-detail {
+  display: flex;
+  justify-content: space-between;
+  grid-column: span 2;
+}
+
+/* NYTT: Lufttryck vänster sida */
+.pressure-left {
+  display: flex;
+  align-items: center;
+}
+
+.pressure-left .detail-icon {
+  flex: 0 0 40px;
+  text-align: center;
+}
+
+.pressure-left .detail-icon i {
+  font-size: 1.8rem;
+  color: #8e44ad; /* Lila färg för barometerikon */
+}
+
+/* NYTT: Lufttryck höger sida */
+.pressure-right {
+  display: flex;
+  align-items: center;
+}
+
+.trend-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.trend-label {
+  font-size: 0.8rem;
+  color: var(--light-text);
+  margin-bottom: 4px;
+}
+
+.trend-value {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.trend-value i {
+  margin-right: 6px;
+}
+
 /* Soluppgång/solnedgång tillsammans på rad men separata ikoner */
 .sun-times {
   grid-column: span 2;
@@ -652,27 +704,6 @@ footer {
 
 .api-key-status.invalid .status-icon i {
   color: #d32f2f;
-}
-
-/* Lufttryckspanel stilar */
-.pressure-detail {
-  position: relative;
-}
-
-.pressure-detail .detail-icon i {
-  color: #8e44ad; /* Lila färg för barometerikon */
-}
-
-.trend-indicator {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 8px;
-  font-size: 0.85rem;
-}
-
-.trend-indicator i {
-  font-size: 0.9rem;
-  margin-right: 4px;
 }
 
 /* Färger för olika trender */
