@@ -1,6 +1,6 @@
 # 🌦️ Svenskt Väder – Microsoft Edge-tillägg
 
-Svenskt Väder är ett stilrent och funktionellt vädertillägg för Microsoft Edge som visar **uppdaterad väderdata från SMHI** för svenska orter. Tillägget innehåller prognoser, vindinformation, luftfuktighet, samt solens upp- och nedgång.
+Svenskt Väder är ett stilrent och funktionellt vädertillägg för Microsoft Edge som visar **uppdaterad väderdata från SMHI** för svenska orter. Tillägget innehåller dagliga prognoser, 9-timmarsprognoser, lufttrycksinformation, vindinformation, luftfuktighet, samt solens upp- och nedgång.
 
 ---
 
@@ -10,7 +10,9 @@ Svenskt Väder är ett stilrent och funktionellt vädertillägg för Microsoft E
 - 🌤 Aktuellt väder, temperatur, molnighet, nederbörd m.m.
 - 💨 Vindinformation i **m/s, Beaufort** eller **beskrivande termer**
 - 🌅 Exakta tider för **soluppgång/solnedgång** (med eller utan API-nyckel)
-- 📅 Prognos för kommande timmar, med symboler och temperaturfärg
+- 📊 **Lufttryck och trycktrend** från närmaste mätstation
+- 🕒 **9-timmars prognos** med symboler och temperaturfärg
+- 📅 **4-dagarsprognos** med min/max temperatur och väderförhållanden
 - 🔔 Automatisk uppdatering var 30:e minut
 - 📦 Kräver ingen inloggning eller konto
 
@@ -51,10 +53,37 @@ Svenskt Väder är ett stilrent och funktionellt vädertillägg för Microsoft E
 
 ## 📡 Använda SMHI och IPGeolocation API
 
-- **SMHI API (offentligt):** Hämtar väderdata för vald ort
+- **SMHI API (offentligt):** 
+  - **Prognos API:** Hämtar väderdata för vald ort
+  - **Observations API:** Hämtar lufttrycksdata från närmaste väderstation
 - **IP Geolocation API (frivillig):** Ger exakta tider för soluppgång/-nedgång. Du kan skaffa en gratis nyckel på https://ipgeolocation.io/
 
-Om ingen API-nyckel anges används en **förenklad solberäkning**.
+Om ingen API-nyckel anges används en **förenklad solberäkning** (visas med tydlig indikator i tillägget).
+
+---
+
+## 📊 Lufttryck och trycktrend
+
+Tillägget visar nu aktuellt lufttryck och trycktrend från SMHI:s observationsstationer:
+
+- **Aktuellt lufttryck** i hPa (millibar)
+- **Trycktrend** med indikation:
+  - 📈 **Stigande** (>+1.0 hPa) - Stabilare väder på väg
+  - 📉 **Fallande** (<-1.0 hPa) - Möjlig väderförändring
+  - ➡️ **Stabilt** (±1.0 hPa) - Oförändrat väderläge
+
+Observera att lufttrycksdata hämtas från närmaste väderstation, vilket kan vara några kilometer från vald ort.
+
+---
+
+## 📱 Prognostyper
+
+Tillägget erbjuder två olika prognostyper:
+
+- **9-timmars prognos** - Visar temperatur och väderförhållanden för kommande 9 timmar, med 3 timmars intervall
+- **4-dagarsprognos** - Visar dagliga min/max temperaturer och dominerande väderförhållanden för aktuell dag plus 3 kommande dagar
+
+Båda prognostyperna visar passande väderikoner och kan bläddras sidledes vid behov.
 
 ---
 
@@ -65,6 +94,7 @@ Om ingen API-nyckel anges används en **förenklad solberäkning**.
 ├── background.js       # Service worker – schemalagda uppdateringar
 ├── popup.html          # Tilläggets gränssnitt
 ├── popup.js            # All väderlogik, händelser och UI
+├── pressure-service.js # Lufttryckshantering och API-koppling
 ├── locations.js        # Lista över orter i Sverige
 ├── styles.css          # Stilar för popup-gränssnittet
 ├── manifest.json       # Manifest v3 för Edge/Chrome
@@ -86,6 +116,7 @@ Om ingen API-nyckel anges används en **förenklad solberäkning**.
 - Förhandsgranska tillägget via `edge://extensions`
 - Alla data sparas med `chrome.storage.local`
 - `popup.js` innehåller UI, logik och API-koppling
+- `pressure-service.js` hanterar lufttrycksdata
 - Du kan mocka väderdata vid behov för test
 
 ---
@@ -96,6 +127,7 @@ Om ingen API-nyckel anges används en **förenklad solberäkning**.
 - 📍 Automatisk platsupptäckt
 - 🌙 Måndata (måne, fas, uppgång)
 - 📲 Export av väderhistorik
+- 🌍 Stöd för internationella platser
 
 ---
 

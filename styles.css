@@ -313,19 +313,20 @@ h3 {
   font-weight: 600;
   font-size: 1rem;
 }
+
 /* ===== FORECAST ===== */
-.forecast-container {
+.forecast-container, .daily-forecast-container {
   padding: 12px;
   border-top: 1px solid var(--border-color);
 }
 
-.forecast-container h2 {
+.forecast-container h2, .daily-forecast-container h2 {
   font-size: 1.1rem;
   margin: 0 0 10px 0;
   font-weight: 500;
 }
 
-.forecast {
+.forecast, .daily-forecast {
   display: flex;
   overflow-x: auto;
   padding-bottom: 8px;
@@ -333,20 +334,21 @@ h3 {
   scrollbar-color: var(--border-color) transparent;
 }
 
-.forecast::-webkit-scrollbar {
+.forecast::-webkit-scrollbar, .daily-forecast::-webkit-scrollbar {
   height: 6px;
 }
 
-.forecast::-webkit-scrollbar-thumb {
+.forecast::-webkit-scrollbar-thumb, .daily-forecast::-webkit-scrollbar-thumb {
   background-color: var(--border-color);
   border-radius: 3px;
 }
 
-.forecast::-webkit-scrollbar-track {
+.forecast::-webkit-scrollbar-track, .daily-forecast::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.forecast-item {
+/* Anpassa bredden för båda typerna av prognoser för att säkerställa att de linjerar */
+.forecast-item, .daily-forecast-item {
   flex: 0 0 auto;
   width: 80px;
   text-align: center;
@@ -357,10 +359,18 @@ h3 {
   transition: transform 0.2s;
   display: flex;
   flex-direction: column;
+}
+
+/* Specifika höjder för varje prognostyp */
+.forecast-item {
   height: 120px;
 }
 
-.forecast-item:hover {
+.daily-forecast-item {
+  height: 150px;
+}
+
+.forecast-item:hover, .daily-forecast-item:hover {
   transform: translateY(-2px);
 }
 
@@ -371,7 +381,7 @@ h3 {
   font-weight: 500;
 }
 
-.forecast-icon i {
+.forecast-icon i, .daily-icon i {
   font-size: 1.6rem;
   margin: 5px 0;
 }
@@ -381,7 +391,7 @@ h3 {
   margin-top: 5px;
 }
 
-.forecast-condition {
+.forecast-condition, .daily-condition {
   font-size: 0.75rem;
   color: var(--light-text);
   margin-top: 5px;
@@ -391,6 +401,43 @@ h3 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+/* ===== DAGSPROGNOSER SPECIALSTIL ===== */
+.daily-date {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 3px;
+  color: var(--text-color);
+}
+
+.daily-day {
+  font-size: 0.8rem;
+  color: var(--light-text);
+  margin-bottom: 8px;
+}
+
+.daily-temp-range {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.daily-high {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.daily-low {
+  color: var(--light-text);
+  font-size: 0.85rem;
+}
+
+.daily-separator {
+  color: var(--light-text);
+  font-size: 0.7rem;
 }
 
 /* ===== ERROR STATE ===== */

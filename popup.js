@@ -34,6 +34,7 @@ const humidity = document.getElementById('humidity');
 const sunriseTime = document.getElementById('sunrise-time');
 const sunsetTime = document.getElementById('sunset-time');
 const forecastItems = document.getElementById('forecast-items');
+const dailyForecastItems = document.getElementById('daily-forecast-items');
 const lastUpdatedSpan = document.getElementById('last-updated');
 const pressureValue = document.getElementById('pressure-value');
 const pressureTrend = document.getElementById('pressure-trend');
@@ -337,13 +338,212 @@ async function processWeatherData(data) {
   sunriseTime.textContent = formatTime(sunTimes.sunrise);
   sunsetTime.textContent = formatTime(sunTimes.sunset);
   
-  // Uppdatera prognos med mer detaljerad information
+  // Uppdatera timprognos med mer detaljerad information
   updateForecast(data.timeSeries.slice(0, 24));
+  
+  // Uppdatera dagsprognos
+  updateDailyForecast(data.timeSeries);
   
   // Uppdatera tidsstämpel
   const now = new Date();
   lastUpdatedSpan.textContent = formatTime(now);
 }
+
+/**
+ * Uppdaterar dagsprognos baserat på tidsseriedata
+ * @param {Array} timeSeries - Array med tidsseriedata från SMHI API
+ */
+function updateDailyForecast(timeSeries) {
+  // Rensa befintliga dagsprognosobjekt
+  dailyForecastItems.innerHTML = '';
+  
+  // Gruppera data per dag
+  const daysData = groupByDay(timeSeries);
+  
+  // Använd bara 4 dagar (idag + 3 framåt)
+  const days = Object.keys(daysData).sort().slice(0, 4);
+  
+  // Loopa genom dagarna och skapa prognosobjekt
+  days.forEach(day => {
+    const dayData = daysData[day];
+    
+    // Om ingen data finns för dagen, hoppa över
+    if (!dayData || dayData.length === 0) return;
+    
+    // Beräkna min/max temperatur för dagen
+    const temps = dayData.map(data => getParameterValue(data, 't')).filter(t => t !== null);
+    const minTemp = Math.min(...temps);
+    const maxTemp = Math.max(...temps);
+    
+    // Hitta middag/dag-väderförhållandet (12-15)
+    let dayWeatherSymbol = null;
+    for (const data of dayData) {
+      const time = new Date(data.validTime);
+      const hour = time.getHours();
+      
+      // Använd väderikon för mitt på dagen om möjligt (typiskt väder för dagen)
+      if (hour >= 12 && hour <= 15) {
+        dayWeatherSymbol = getParameterValue(data, 'Wsymb2');
+        break;
+      }
+    }
+    
+    // Fallback om ingen middag hittas, använd det vanligaste vädret under dagen
+    if (dayWeatherSymbol === null) {
+      const symbolCounts = {};
+      dayData.forEach(data => {
+        const symbol = getParameterValue(data, 'Wsymb2');
+        if (symbol !== null) {
+          symbolCounts[symbol] = (symbolCounts[symbol] || 0) + 1;
+        }
+      });
+      
+      let maxCount = 0;
+      for (const symbol in symbolCounts) {
+        if (symbolCounts[symbol] > maxCount) {
+          maxCount = symbolCounts[symbol];
+          dayWeatherSymbol = parseInt(symbol);
+        }
+      }
+    }
+    
+    // Fallback om fortfarande ingen symbol, använd första
+    if (dayWeatherSymbol === null && dayData.length > 0) {
+      dayWeatherSymbol = getParameterValue(dayData[0], 'Wsymb2');
+    }
+    
+    // Skapa ett datum för visning
+    const date = new Date(dayData[0].validTime);
+    
+    // Skapa prognosobjekt för dagen
+    createDailyForecastItem(date, dayWeatherSymbol, minTemp, maxTemp);
+  });
+}
+
+/**
+ * Grupperar tidsserier efter dag
+ * @param {Array} timeSeries - Array med tidsseriedata från SMHI API
+ * @returns {Object} Objekt med dagar som nycklar och array med data för varje dag
+ */
+function groupByDay(timeSeries) {
+  const days = {};
+  
+  timeSeries.forEach(data => {
+    const date = new Date(data.validTime);
+    const day = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    if (!days[day]) {
+      days[day] = [];
+    }
+    
+    days[day].push(data);
+  });
+  
+  return days;
+}
+
+/**
+ * Skapar och lägger till ett dagsprognosobjekt i UI
+ * @param {Date} date - Datum för prognosen
+ * @param {number} symbol - Vädersymbol
+ * @param {number} minTemp - Minimum temperatur
+ * @param {number} maxTemp - Maximum temperatur
+ */
+function createDailyForecastItem(date, symbol, minTemp, maxTemp) {
+  // Skapa prognosobjekt
+  const forecastItem = document.createElement('div');
+  forecastItem.className = 'daily-forecast-item';
+  
+  // Hämta veckodagsnamn och datum
+  const dayName = getDayName(date);
+  const dateString = formatDate(date);
+  
+  // Skapa datumsektion
+  const dateElem = document.createElement('div');
+  dateElem.className = 'daily-date';
+  dateElem.textContent = dateString;
+  
+  // Skapa veckodagssektion
+  const dayElem = document.createElement('div');
+  dayElem.className = 'daily-day';
+  dayElem.textContent = dayName;
+  
+  // Skapa ikonsektion
+  const iconElem = document.createElement('div');
+  iconElem.className = 'daily-icon';
+  // Använd alltid dag-variant för dygnsprognos
+  iconElem.innerHTML = `<i class="wi ${getWeatherIconClass(symbol, true)}"></i>`;
+  
+  // Skapa temperatursektion
+  const tempElem = document.createElement('div');
+  tempElem.className = 'daily-temp-range';
+  
+  // Lägg till max-temp
+  const maxTempElem = document.createElement('span');
+  maxTempElem.className = 'daily-high';
+  maxTempElem.textContent = `${maxTemp.toFixed(1)}°`;
+  
+  // Separator
+  const separator = document.createElement('span');
+  separator.className = 'daily-separator';
+  separator.textContent = '/';
+  
+  // Lägg till min-temp
+  const minTempElem = document.createElement('span');
+  minTempElem.className = 'daily-low';
+  minTempElem.textContent = `${minTemp.toFixed(1)}°`;
+  
+  // Lägg till väderinformation
+  const conditionElem = document.createElement('div');
+  conditionElem.className = 'daily-condition';
+  conditionElem.textContent = getWeatherDescription(symbol);
+  
+  // Lägg till alla element i prognosobjektet
+  tempElem.appendChild(maxTempElem);
+  tempElem.appendChild(separator);
+  tempElem.appendChild(minTempElem);
+  
+  forecastItem.appendChild(dateElem);
+  forecastItem.appendChild(dayElem);
+  forecastItem.appendChild(iconElem);
+  forecastItem.appendChild(tempElem);
+  forecastItem.appendChild(conditionElem);
+  
+  // Lägg till prognosobjektet i behållaren
+  dailyForecastItems.appendChild(forecastItem);
+}
+
+/**
+ * Hämtar veckodagsnamn på svenska
+ * @param {Date} date - Datum
+ * @returns {string} Veckodagsnamn på svenska
+ */
+function getDayName(date) {
+  const days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+  
+  // Kontrollera om dagen är idag, imorgon eller i övermorgon
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  
+  if (date.toDateString() === today.toDateString()) {
+    return 'Idag';
+  } else if (date.toDateString() === tomorrow.toDateString()) {
+    return 'Imorgon';
+  } else {
+    return days[date.getDay()];
+  }
+}
+
+/**
+ * Formaterar datum på det svenska sättet
+ * @param {Date} date - Datum
+ * @returns {string} Formaterat datum (d/m)
+ */
+function formatDate(date) {
+  return `${date.getDate()}/${date.getMonth() + 1}`;
+}
+
 /**
  * Uppdaterar lufttrycksdisplayen baserat på hämtad data
  * @param {Object} pressureData - Objekt med lufttrycksdata
