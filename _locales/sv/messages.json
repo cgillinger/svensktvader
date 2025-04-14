@@ -1,0 +1,70 @@
+{
+  "appName": {
+    "message": "Svenskt Väder",
+    "description": "Applikationens namn"
+  },
+  "appDesc": {
+    "message": "Visar väderdata för orter i Sverige med information från SMHI",
+    "description": "Beskrivning av applikationen"
+  },
+  "loading": {
+    "message": "Laddar väderdata...",
+    "description": "Text vid laddning"
+  },
+  "selectLocation": {
+    "message": "Välj plats",
+    "description": "Uppmaning att välja plats"
+  },
+  "defaultOption": {
+    "message": "Välj en plats...",
+    "description": "Standardalternativ i platsväljaren"
+  },
+  "errorLoading": {
+    "message": "Kunde inte ladda väderdata. Försök igen senare.",
+    "description": "Felmeddelande vid laddningsfel"
+  },
+  "forecast": {
+    "message": "Prognos",
+    "description": "Rubrik för prognosdelen"
+  },
+  "dataFrom": {
+    "message": "Data från SMHI. Uppdaterad:",
+    "description": "Information om datakälla"
+  },
+  "settings": {
+    "message": "Inställningar",
+    "description": "Rubrik för inställningar"
+  },
+  "apiKeyLabel": {
+    "message": "IP Geolocation API-nyckel:",
+    "description": "Etikett för API-nyckel"
+  },
+  "apiKeyPlaceholder": {
+    "message": "Ange din API-nyckel här",
+    "description": "Platshållare för API-nyckel"
+  },
+  "apiKeyDescription": {
+    "message": "Krävs för att visa soluppgång/solnedgång. Skaffa en gratis nyckel på ipgeolocation.io.",
+    "description": "Beskrivning av API-nyckel"
+  },
+  "windScaleLabel": {
+    "message": "Visa vindhastighet som:",
+    "description": "Etikett för vindskala"
+  },
+  "windScaleMS": {
+    "message": "Meter per sekund (m/s)",
+    "description": "Alternativ för meter per sekund"
+  },
+  "windScaleBeaufort": {
+    "message": "Beaufort-skala (0-12)",
+    "description": "Alternativ för Beaufort-skala"
+  },
+  "windScaleTextSea": {
+    "message": "Beskrivande (Bris, Kuling, etc.)",
+    "description": "Alternativ för beskrivande vindskala"
+  },
+  "saveButton": {
+    "message": "Spara",
+    "description": "Text på spara-knapp"
+  }
+}

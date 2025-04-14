@@ -1,0 +1,78 @@
+// locations.js
+// Innehåller en alfabetisk lista med svenska orter och deras koordinater
+
+const swedishLocations = [
+  // Storstäder med stadsdelar
+  { name: "Stockholm", lat: 59.329323, lon: 18.068581 },
+  { name: "Stockholm Norra", lat: 59.362103, lon: 18.031149 },
+  { name: "Stockholm Södra", lat: 59.309959, lon: 18.075123 },
+  { name: "Stockholm Östra", lat: 59.336688, lon: 18.121452 },
+  { name: "Stockholm Västra", lat: 59.334839, lon: 17.979628 },
+  
+  { name: "Göteborg", lat: 57.708870, lon: 11.974560 },
+  { name: "Göteborg Norra", lat: 57.747103, lon: 11.978134 },
+  { name: "Göteborg Södra", lat: 57.678096, lon: 11.956731 },
+  { name: "Göteborg Östra", lat: 57.708970, lon: 12.025523 },
+  { name: "Göteborg Västra", lat: 57.699278, lon: 11.913796 },
+  
+  { name: "Malmö", lat: 55.605063, lon: 13.003822 },
+  { name: "Malmö Norra", lat: 55.625034, lon: 13.002716 },
+  { name: "Malmö Södra", lat: 55.586501, lon: 12.994192 },
+  { name: "Malmö Östra", lat: 55.604732, lon: 13.035236 },
+  { name: "Malmö Västra", lat: 55.604129, lon: 12.971578 },
+  
+  // Övriga städer och orter i alfabetisk ordning
+  { name: "Alingsås", lat: 57.930092, lon: 12.533700 },
+  { name: "Arvidsjaur", lat: 65.594660, lon: 19.164293 },
+  { name: "Boden", lat: 65.825892, lon: 21.688702 },
+  { name: "Borlänge", lat: 60.484501, lon: 15.443132 },
+  { name: "Borås", lat: 57.721113, lon: 12.940134 },
+  { name: "Enköping", lat: 59.635900, lon: 17.077896 },
+  { name: "Eskilstuna", lat: 59.371096, lon: 16.509546 },
+  { name: "Falkenberg", lat: 56.904044, lon: 12.490515 },
+  { name: "Falun", lat: 60.606525, lon: 15.635676 },
+  { name: "Gällivare", lat: 67.133451, lon: 20.660799 },
+  { name: "Gävle", lat: 60.674945, lon: 17.141417 },
+  { name: "Halmstad", lat: 56.674445, lon: 12.857721 },
+  { name: "Haparanda", lat: 65.835299, lon: 24.125862 },
+  { name: "Helsingborg", lat: 56.046519, lon: 12.694557 },
+  { name: "Hudiksvall", lat: 61.727800, lon: 17.104435 },
+  { name: "Jönköping", lat: 57.782812, lon: 14.160526 },
+  { name: "Kalmar", lat: 56.663420, lon: 16.356779 },
+  { name: "Karlskrona", lat: 56.161304, lon: 15.586938 },
+  { name: "Karlstad", lat: 59.402217, lon: 13.511454 },
+  { name: "Kiruna", lat: 67.855800, lon: 20.225301 },
+  { name: "Kristianstad", lat: 56.029419, lon: 14.156780 },
+  { name: "Lidköping", lat: 58.503805, lon: 13.157457 },
+  { name: "Linköping", lat: 58.410809, lon: 15.621373 },
+  { name: "Luleå", lat: 65.584216, lon: 22.153572 },
+  { name: "Lund", lat: 55.704721, lon: 13.191036 },
+  { name: "Mora", lat: 61.004951, lon: 14.537108 },
+  { name: "Norrköping", lat: 58.587745, lon: 16.192421 },
+  { name: "Nyköping", lat: 58.753123, lon: 17.010428 },
+  { name: "Piteå", lat: 65.316342, lon: 21.479783 },
+  { name: "Skellefteå", lat: 64.750137, lon: 20.950985 },
+  { name: "Skövde", lat: 58.389723, lon: 13.846546 },
+  { name: "Sollefteå", lat: 63.166820, lon: 17.268580 },
+  { name: "Sundsvall", lat: 62.390811, lon: 17.306927 },
+  { name: "Södertälje", lat: 59.195148, lon: 17.625904 },
+  { name: "Trollhättan", lat: 58.283188, lon: 12.286644 },
+  { name: "Umeå", lat: 63.825848, lon: 20.263035 },
+  { name: "Uppsala", lat: 59.858562, lon: 17.638927 },
+  { name: "Varberg", lat: 57.105339, lon: 12.248911 },
+  { name: "Visby", lat: 57.634800, lon: 18.300345 },
+  { name: "Västerås", lat: 59.609901, lon: 16.544808 },
+  { name: "Växjö", lat: 56.879056, lon: 14.805950 },
+  { name: "Ystad", lat: 55.429881, lon: 13.820241 },
+  { name: "Örebro", lat: 59.275323, lon: 15.213400 },
+  { name: "Örnsköldsvik", lat: 63.290678, lon: 18.715584 },
+  { name: "Östersund", lat: 63.179291, lon: 14.635773 },
+  { name: "Åre", lat: 63.399356, lon: 13.081168 },
+  { name: "Älvdalen", lat: 61.229683, lon: 14.037720 },
+  { name: "Ängelholm", lat: 56.242950, lon: 12.860439 }
+];
+
+// Sorterar orterna alfabetiskt (på svenskt sätt)
+swedishLocations.sort((a, b) => a.name.localeCompare(b.name, 'sv'));
+
+export default swedishLocations;

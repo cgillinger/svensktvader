@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Svenskt Väder</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Inkludera Weather Icons korrekt -->
+  <link rel="stylesheet" href="weather-icons/css/weather-icons.min.css">
+  <link rel="stylesheet" href="weather-icons/css/weather-icons-wind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="top-bar">
+        <h1>Svenskt Väder</h1>
+        <button id="settings-button" class="settings-button" aria-label="Inställningar">
+          <i class="fas fa-cog"></i>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="loading" id="loading-indicator">
+        <span class="wi wi-day-cloudy loading-icon"></span>
+        <span>Laddar väderdata...</span>
+      </div>
+
+      <div class="weather-container" id="weather-display" style="display: none;">
+        <!-- Platsnamn ovanför temperatur -->
+        <div class="location-display">
+          <h2 id="selected-location-name">Stockholm</h2>
+        </div>
+        
+        <div class="current-weather">
+          <div class="weather-icon">
+            <i id="current-weather-icon" class="wi wi-day-sunny"></i>
+          </div>
+          <div class="current-temp">
+            <span id="current-temp-value">--</span>°C
+          </div>
+          <div class="weather-description" id="weather-description">
+            Uppehåll
+          </div>
+          
+          <!-- Luftfuktighet flyttad till den blå panelen -->
+          <div class="humidity-display">
+            <i class="wi wi-humidity"></i>
+            <span id="humidity">--%</span>
+          </div>
+        </div>
+
+        <!-- Omdesignade väderdetaljer med tydliga etiketter -->
+        <div class="weather-details">
+          <div class="detail">
+            <div class="detail-icon">
+              <!-- Vindikon som kan ändras baserat på vindskala -->
+              <i id="wind-speed-icon" class="wi wi-strong-wind"></i>
+            </div>
+            <div class="detail-info">
+              <div class="detail-label">Vind</div>
+              <div class="detail-value" id="wind-speed">-- m/s</div>
+            </div>
+          </div>
+          
+          <div class="detail">
+            <div class="detail-icon">
+              <!-- Använd 'from-' istället för 'towards-' för korrekt vindriktningsvisning -->
+              <i class="wi wi-wind from-0-deg direction-icon"></i>
+            </div>
+            <div class="detail-info">
+              <div class="detail-label">Riktning</div>
+              <div class="detail-value" id="wind-direction">--</div>
+            </div>
+          </div>
+          
+          <!-- Soluppgång och solnedgång tillsammans men med separata gula ikoner -->
+          <div class="detail sun-times">
+            <div class="sunrise-container">
+              <div class="sun-label">Soluppgång</div>
+              <i class="wi wi-sunrise sun-icon"></i>
+              <div class="time-value" id="sunrise-time">05:38</div>
+            </div>
+            <div class="sunset-container">
+              <div class="sun-label">Solnedgång</div>
+              <i class="wi wi-sunset sun-icon"></i>
+              <div class="time-value" id="sunset-time">19:59</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Förbättrad prognossektion -->
+        <div class="forecast-container">
+          <h2>Prognos</h2>
+          <div class="forecast" id="forecast-items">
+            <!-- Fylls dynamiskt i JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <div class="error-message" id="error-message" style="display: none;">
+        <span class="wi wi-na"></span>
+        <p>Kunde inte ladda väderdata. Försök igen senare.</p>
+      </div>
+      
+      <!-- Inställningspanel -->
+      <div id="settings-panel" class="settings-panel" style="display: none;">
+        <div class="settings-header">
+          <h2>Inställningar</h2>
+          <button id="close-settings" class="close-button"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <!-- Platsväljare flyttad till inställningar -->
+        <div class="setting-item">
+          <label for="location-select">Plats:</label>
+          <select id="location-select">
+            <!-- Fylls dynamiskt från locations.js -->
+          </select>
+        </div>
+        
+        <div class="setting-item">
+          <label for="api-key-input">IP Geolocation API-nyckel:</label>
+          <input type="text" id="api-key-input" placeholder="Ange din API-nyckel här">
+          <p class="setting-description">Krävs för att visa <strong>exakta tider</strong> för soluppgång/solnedgång. Utan API-nyckel används en förenklad beräkning som ger uppskattade tider. Skaffa en gratis nyckel på <a href="https://ipgeolocation.io/" target="_blank">ipgeolocation.io</a>.</p>
+          <div class="api-key-status" id="api-key-status">
+            <span id="api-key-icon" class="status-icon"><i class="fas fa-info-circle"></i></span>
+            <span id="api-key-message">Soldata: Använder förenklad beräkning</span>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <label>Visa vindhastighet som:</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="wind-scale" value="ms"> 
+              Meter per sekund (m/s)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="wind-scale" value="beaufort" checked> 
+              Beaufort-skala (0-12)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="wind-scale" value="textsea"> 
+              Beskrivande (Bris, Kuling, etc.)
+            </label>
+          </div>
+        </div>
+        
+        <!-- Spara-knapp flyttad över attribution -->
+        <div class="setting-actions">
+          <button id="save-settings" class="primary-button">Spara</button>
+        </div>
+        
+        <!-- Attribution sektion -->
+        <div class="setting-item attribution-section">
+          <h3>Attribution</h3>
+          <div class="attribution-box">
+            <p><strong>Väderikoner:</strong></p>
+            <ul>
+              <li>Weather Icons by <a href="https://github.com/erikflowers/weather-icons" target="_blank">Erik Flowers</a>, licensierad under <a href="https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL" target="_blank">SIL OFL 1.1</a></li>
+              <li>Animerade SVG väderikoner av <a href="https://www.amcharts.com/free-animated-svg-weather-icons/" target="_blank">amCharts</a>, licensierad under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International Public License</a></li>
+            </ul>
+            <p class="attribution-note">Detta innebär att ikonerna kan användas för kommersiellt bruk så länge attribution ges till upphovsmännen.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Data från SMHI. Uppdaterad: <span id="last-updated">--:--</span></p>
+    </footer>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
