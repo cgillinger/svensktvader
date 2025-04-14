@@ -360,8 +360,14 @@ function updateDailyForecast(timeSeries) {
   // Gruppera data per dag
   const daysData = groupByDay(timeSeries);
   
-  // Använd bara 4 dagar (idag + 3 framåt)
-  const days = Object.keys(daysData).sort().slice(0, 4);
+  // Hämta dagens datum i YYYY-MM-DD format för att kunna exkludera det
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Sortera dagar och filtrera bort dagens datum - visa bara framtida dagar
+  const days = Object.keys(daysData)
+    .filter(day => day > today)  // Filtrera bort dagens datum
+    .sort()                      // Sortera i stigande ordning
+    .slice(0, 4);                // Begränsa till 4 dagar
   
   // Loopa genom dagarna och skapa prognosobjekt
   days.forEach(day => {
