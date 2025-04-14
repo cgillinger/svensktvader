@@ -7,6 +7,7 @@
   "permissions": ["storage", "geolocation", "alarms"],
   "host_permissions": [
     "https://opendata-download-metfcst.smhi.se/*",
+    "https://opendata-download-metobs.smhi.se/*",
     "https://api.ipgeolocation.io/*"
   ],
   "action": {
@@ -19,7 +20,8 @@
     "default_title": "Svenskt Väder"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "icons": {
     "16": "icons/icon16.png",

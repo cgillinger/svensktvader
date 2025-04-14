@@ -2,15 +2,26 @@
 // Bakgrundsskript för Svenskt Väder Edge-tillägg
 // Hanterar periodiska uppdateringar och notifikationer
 
+// Importera pressure-service.js
+import { getPressureData, buildLocationStationMap } from './pressure-service.js';
+import swedishLocations from './locations.js';
+
 // Konstanter
 const UPDATE_INTERVAL = 30; // 30 minuter
 const STORAGE_KEYS = {
   SELECTED_LOCATION: 'selectedLocation',
+  SELECTED_LOCATION_NAME: 'selectedLocationName',
   LAST_UPDATED: 'lastUpdated',
   WEATHER_DATA: 'weatherData',
   API_KEY: 'ipGeolocationApiKey',
   WIND_SCALE: 'windScale',
-  SUN_TIMES_CACHE: 'sunTimesCache' // Ny konstant för sol-cache
+  SUN_TIMES_CACHE: 'sunTimesCache', // Sol-cache
+  // Nycklar för lufttryck
+  CURRENT_PRESSURE: 'currentPressure',
+  PRESSURE_TREND: 'pressureTrend',
+  STATIONS_DATA: 'stationsData',
+  STATIONS_UPDATED: 'stationsUpdated',
+  LOCATION_STATION_MAP: 'locationStationMap'
 };
 
 // Konfigurera periodiska uppdateringar när tillägget installeras
@@ -25,6 +36,9 @@ function setupPeriodicUpdates() {
   
   // Lägg till en daglig uppdatering för att rensa gammal sol-cache
   chrome.alarms.create('cleanSunCache', { periodInMinutes: 24 * 60 }); // En gång per dygn
+  
+  // Lägg till veckovis uppdatering av stationsdata
+  chrome.alarms.create('updateStations', { periodInMinutes: 7 * 24 * 60 }); // En gång per vecka
 }
 
 // Lyssna efter alarm och uppdatera väderdata
@@ -35,16 +49,20 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   } else if (alarm.name === 'cleanSunCache') {
     console.log('Alarm utlöst. Rensar gammal sol-cache.');
     cleanOldSunCache();
+  } else if (alarm.name === 'updateStations') {
+    console.log('Alarm utlöst. Uppdaterar stationsdata.');
+    updateStationsData();
   }
 });
 
 // Funktion för att uppdatera väderdata
 function updateWeatherData() {
   // Hämta vald ort från lagring
-  chrome.storage.local.get([STORAGE_KEYS.SELECTED_LOCATION], (result) => {
-    const selectedLocation = result.SELECTED_LOCATION;
+  chrome.storage.local.get([STORAGE_KEYS.SELECTED_LOCATION, STORAGE_KEYS.SELECTED_LOCATION_NAME], (result) => {
+    const selectedLocation = result[STORAGE_KEYS.SELECTED_LOCATION];
+    const locationName = result[STORAGE_KEYS.SELECTED_LOCATION_NAME];
     
-    if (!selectedLocation) {
+    if (!selectedLocation || !locationName) {
       console.log('Ingen ort vald. Hoppar över uppdatering.');
       return;
     }
@@ -58,11 +76,28 @@ function updateWeatherData() {
         // Spara den uppdaterade datan
         saveWeatherData(data);
         console.log('Väderdata uppdaterades framgångsrikt.');
+        
+        // Hämta och spara lufttrycksdata
+        return getPressureData(locationName, swedishLocations);
+      })
+      .then(pressureData => {
+        console.log('Lufttrycksdata uppdaterad:', pressureData);
       })
       .catch(error => {
-        console.error('Fel vid uppdatering av väderdata:', error);
+        console.error('Fel vid uppdatering av väder- eller lufttrycksdata:', error);
       });
   });
+}
+
+// Funktion för att uppdatera stationsdata
+function updateStationsData() {
+  buildLocationStationMap(swedishLocations)
+    .then(map => {
+      console.log('Stations-mappning uppdaterad:', Object.keys(map).length, 'orter mappade');
+    })
+    .catch(error => {
+      console.error('Fel vid uppdatering av stationsdata:', error);
+    });
 }
 
 // Funktion för att rensa gammal cache för soldata

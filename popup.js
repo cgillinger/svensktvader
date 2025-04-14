@@ -2,6 +2,7 @@
 // Uppdaterat huvudskript för Svenskt Väder Edge-tillägg
 
 import swedishLocations from './locations.js';
+import { getPressureData } from './pressure-service.js';
 
 // Konstanter
 const SMHI_API_BASE = 'https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point';
@@ -12,9 +13,11 @@ const STORAGE_KEYS = {
   LAST_UPDATED: 'lastUpdated',
   WEATHER_DATA: 'weatherData',
   API_KEY: 'ipGeolocationApiKey',
-  WIND_SCALE: 'windScale'
+  WIND_SCALE: 'windScale',
+  // Nya nycklar för lufttryck
+  CURRENT_PRESSURE: 'currentPressure',
+  PRESSURE_TREND: 'pressureTrend'
 };
-
 // DOM-element
 const locationSelect = document.getElementById('location-select');
 const selectedLocationName = document.getElementById('selected-location-name');
@@ -32,6 +35,9 @@ const sunriseTime = document.getElementById('sunrise-time');
 const sunsetTime = document.getElementById('sunset-time');
 const forecastItems = document.getElementById('forecast-items');
 const lastUpdatedSpan = document.getElementById('last-updated');
+const pressureValue = document.getElementById('pressure-value');
+const pressureTrend = document.getElementById('pressure-trend');
+const pressureTrendIcon = document.getElementById('pressure-trend-icon');
 
 // DOM-element för inställningar
 const settingsButton = document.getElementById('settings-button');
@@ -40,7 +46,6 @@ const settingsPanel = document.getElementById('settings-panel');
 const apiKeyInput = document.getElementById('api-key-input');
 const saveSettingsButton = document.getElementById('save-settings');
 const windScaleRadios = document.querySelectorAll('input[name="wind-scale"]');
-
 // Initialisera tillägget
 document.addEventListener('DOMContentLoaded', initializeExtension);
 /**
@@ -191,10 +196,11 @@ function handleLocationChange() {
   // Ladda väderdata för vald ort
   loadWeatherData();
 }
+
 /**
  * Laddar väderdata för vald ort
  */
-function loadWeatherData() {
+async function loadWeatherData() {
   const selectedValue = locationSelect.value;
   
   // Om ingen ort är vald, gör ingenting
@@ -208,24 +214,36 @@ function loadWeatherData() {
   // Tolka vald ort
   const [lat, lon] = selectedValue.split(',');
   
-  // Hämta väderdata från SMHI API
-  fetchWeatherData(lat, lon)
-    .then(data => {
-      // Behandla och visa väderdata
-      processWeatherData(data);
-      
-      // Spara data och uppdatera tidsstämpel
-      saveWeatherData(data);
-      
-      // Visa väderdisplayen
-      showWeatherDisplay();
-    })
-    .catch(error => {
-      console.error('Fel vid laddning av väderdata:', error);
-      showErrorState();
-    });
+  // Hämta ortsnamnet
+  const locationName = selectedLocationName.textContent;
+  
+  try {
+    // Hämta väderdata från SMHI API
+    const weatherData = await fetchWeatherData(lat, lon);
+    
+    // Behandla och visa väderdata
+    processWeatherData(weatherData);
+    
+    // Spara data och uppdatera tidsstämpel
+    saveWeatherData(weatherData);
+    
+    // Parallellt, hämta lufttrycksdata för platsen
+    getPressureData(locationName, swedishLocations)
+      .then(pressureData => {
+        updatePressureDisplay(pressureData);
+      })
+      .catch(error => {
+        console.error('Fel vid hämtning av lufttrycksdata:', error);
+        hidePressureDisplay();
+      });
+    
+    // Visa väderdisplayen
+    showWeatherDisplay();
+  } catch (error) {
+    console.error('Fel vid laddning av väderdata:', error);
+    showErrorState();
+  }
 }
-
 /**
  * Hämtar väderdata från SMHI API
  * @param {string} lat - Latitud
@@ -295,6 +313,80 @@ async function processWeatherData(data) {
   // Uppdatera tidsstämpel
   const now = new Date();
   lastUpdatedSpan.textContent = formatTime(now);
+}
+
+/**
+ * Uppdaterar lufttrycksdisplayen baserat på hämtad data
+ * @param {Object} pressureData - Objekt med lufttrycksdata
+ */
+function updatePressureDisplay(pressureData) {
+  const container = document.querySelector('.pressure-detail');
+  
+  if (!pressureData || pressureData.currentPressure === null) {
+    // Dölj panelen om ingen data
+    if (container) {
+      container.style.display = 'none';
+    }
+    return;
+  }
+  
+  // Visa panelen
+  if (container) {
+    container.style.display = 'flex';
+  }
+  
+  // Uppdatera värden
+  if (pressureValue) {
+    pressureValue.textContent = `${pressureData.currentPressure.toFixed(1)} hPa`;
+  }
+  
+  if (pressureTrend) {
+    pressureTrend.textContent = pressureData.pressureTrend;
+  }
+  
+  // Uppdatera trändikon baserat på trend
+  if (pressureTrendIcon) {
+    updatePressureTrendIcon(pressureData.pressureTrend);
+  }
+}
+
+/**
+ * Uppdaterar trycktrend-ikonen baserat på trend
+ * @param {string} trend - Trycktrend ("Stigande", "Fallande" eller "Stabilt")
+ */
+function updatePressureTrendIcon(trend) {
+  // Rensa befintliga klasser
+  pressureTrendIcon.className = 'wi';
+  
+  // Lägg till lämplig ikon
+  switch (trend) {
+    case 'Stigande':
+      pressureTrendIcon.classList.add('wi-direction-up');
+      pressureTrendIcon.style.color = '#4caf50'; // Grön
+      break;
+    case 'Fallande':
+      pressureTrendIcon.classList.add('wi-direction-down');
+      pressureTrendIcon.style.color = '#f44336'; // Röd
+      break;
+    case 'Stabilt':
+      pressureTrendIcon.classList.add('wi-direction-right');
+      pressureTrendIcon.style.color = '#ff9800'; // Gul/orange
+      break;
+    default:
+      pressureTrendIcon.classList.add('wi-na');
+      pressureTrendIcon.style.color = '#9e9e9e'; // Grå
+      break;
+  }
+}
+
+/**
+ * Döljer lufttrycksdisplayen vid fel
+ */
+function hidePressureDisplay() {
+  const container = document.querySelector('.pressure-detail');
+  if (container) {
+    container.style.display = 'none';
+  }
 }
 /**
  * Uppdaterar väderikon baserat på väderförhållanden och tid på dygnet
@@ -424,6 +516,7 @@ function updateForecast(timeSeries) {
     forecastItems.appendChild(forecastItem);
   }
 }
+
 /**
  * Hämtar väderikonklass baserat på SMHI väderssymbol
  * @param {number} symbol - SMHI vädersymbolkod

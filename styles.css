@@ -243,7 +243,6 @@ h3 {
   font-weight: 600;
   font-size: 1rem;
 }
-
 /* ===== FORECAST ===== */
 .forecast-container {
   padding: 12px;
@@ -653,4 +652,38 @@ footer {
 
 .api-key-status.invalid .status-icon i {
   color: #d32f2f;
+}
+
+/* Lufttryckspanel stilar */
+.pressure-detail {
+  position: relative;
+}
+
+.pressure-detail .detail-icon i {
+  color: #8e44ad; /* Lila färg för barometerikon */
+}
+
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  font-size: 0.85rem;
+}
+
+.trend-indicator i {
+  font-size: 0.9rem;
+  margin-right: 4px;
+}
+
+/* Färger för olika trender */
+.wi-direction-up {
+  color: #4caf50; /* Grön för stigande */
+}
+
+.wi-direction-down {
+  color: #f44336; /* Röd för fallande */
+}
+
+.wi-direction-right {
+  color: #ff9800; /* Gul/orange för stabilt */
 }
