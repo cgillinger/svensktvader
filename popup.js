@@ -37,6 +37,7 @@ const forecastItems = document.getElementById('forecast-items');
 const lastUpdatedSpan = document.getElementById('last-updated');
 const pressureValue = document.getElementById('pressure-value');
 const pressureTrend = document.getElementById('pressure-trend');
+const pressureTrendDescription = document.getElementById('pressure-trend-description');
 const pressureTrendIcon = document.getElementById('pressure-trend-icon');
 
 // DOM-element för inställningar
@@ -368,8 +369,36 @@ function updatePressureDisplay(pressureData) {
     pressureValue.textContent = `${pressureData.currentPressure.toFixed(1)} hPa`;
   }
   
+  // Uppdatera med trend och beskrivning på separata rader
+  let trendName = '';
+  let trendDescription = '';
+  
+  switch(pressureData.pressureTrend) {
+    case 'Stigande':
+      trendName = 'Stigande';
+      trendDescription = 'Stabilare väder på väg';
+      break;
+    case 'Fallande':
+      trendName = 'Fallande';
+      trendDescription = 'Möjlig väderförändring';
+      break;
+    case 'Stabilt':
+      trendName = 'Stabilt';
+      trendDescription = 'Oförändrat väderläge';
+      break;
+    default:
+      trendName = pressureData.pressureTrend;
+      trendDescription = '';
+  }
+  
+  // Uppdatera trendtexten
   if (pressureTrend) {
-    pressureTrend.textContent = pressureData.pressureTrend;
+    pressureTrend.textContent = trendName;
+  }
+  
+  // Uppdatera beskrivningstexten
+  if (pressureTrendDescription) {
+    pressureTrendDescription.textContent = trendDescription;
   }
   
   // Uppdatera trändikon baserat på trend
