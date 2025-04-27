@@ -3,7 +3,7 @@
 
 // Konstanter
 const METOBS_API_BASE = 'https://opendata-download-metobs.smhi.se/api/version/1.0';
-const PRESSURE_PARAMETER = 1; // Parameter 1 är lufttryck (hPa)
+const PRESSURE_PARAMETER = 9; // Parameter 9 är lufttryck reducerat till havsytans nivå (hPa)
 const STATION_CACHE_EXPIRE = 7 * 24 * 60 * 60 * 1000; // 7 dagar i millisekunder
 const TREND_THRESHOLD = 1.0; // hPa skillnad för att definiera en trend
 const STORAGE_KEYS = {
@@ -226,23 +226,12 @@ function calculatePressureTrend(values) {
   const recentValues = sortedValues.slice(-Math.min(6, sortedValues.length));
   
   // Aktuellt tryck (senaste värdet)
-  // VIKTIGT: Konvertera kPa till hPa om värdet är för litet
   let currentPressure = parseFloat(recentValues[recentValues.length - 1].value);
   
   // Första värde i vår tidsserie för jämförelse
   let firstPressure = parseFloat(recentValues[0].value);
   
-  // Kontrollera om värdena verkar vara i kPa istället för hPa
-  // Normalt lufttryck vid havsytan är cirka 1013.25 hPa
-  // Om värdet är under 100, är det troligen i kPa och behöver konverteras
-  if (currentPressure < 100) {
-    currentPressure = currentPressure * 100; // Konvertera kPa till hPa
-    console.log(`Konverterade lufttryck från kPa till hPa: ${currentPressure} hPa`);
-  }
-  
-  if (firstPressure < 100) {
-    firstPressure = firstPressure * 100; // Konvertera kPa till hPa
-  }
+  // Eftersom vi nu använder parameter 9 har vi redan hPa, ingen konvertering krävs
   
   // Beräkna skillnad
   const pressureDifference = currentPressure - firstPressure;
