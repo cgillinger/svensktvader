@@ -226,10 +226,23 @@ function calculatePressureTrend(values) {
   const recentValues = sortedValues.slice(-Math.min(6, sortedValues.length));
   
   // Aktuellt tryck (senaste värdet)
-  const currentPressure = parseFloat(recentValues[recentValues.length - 1].value);
+  // VIKTIGT: Konvertera kPa till hPa om värdet är för litet
+  let currentPressure = parseFloat(recentValues[recentValues.length - 1].value);
   
   // Första värde i vår tidsserie för jämförelse
-  const firstPressure = parseFloat(recentValues[0].value);
+  let firstPressure = parseFloat(recentValues[0].value);
+  
+  // Kontrollera om värdena verkar vara i kPa istället för hPa
+  // Normalt lufttryck vid havsytan är cirka 1013.25 hPa
+  // Om värdet är under 100, är det troligen i kPa och behöver konverteras
+  if (currentPressure < 100) {
+    currentPressure = currentPressure * 100; // Konvertera kPa till hPa
+    console.log(`Konverterade lufttryck från kPa till hPa: ${currentPressure} hPa`);
+  }
+  
+  if (firstPressure < 100) {
+    firstPressure = firstPressure * 100; // Konvertera kPa till hPa
+  }
   
   // Beräkna skillnad
   const pressureDifference = currentPressure - firstPressure;
