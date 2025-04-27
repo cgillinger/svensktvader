@@ -170,18 +170,21 @@ h3 {
   transform: translateY(-2px);
 }
 
-/* NYTT: Tvåspaltig detalj */
+/* UPPDATERAD: Tvåspaltig detalj - mer mellanrum mellan spalterna */
 .two-column-detail {
   display: flex;
   justify-content: space-between;
   grid-column: span 2;
+  gap: 15px; /* Ökat mellanrum mellan vänster och höger sida */
 }
 
-/* NYTT: Lufttryck vänster sida */
+/* UPPDATERAD: Lufttryck vänster sida - ökad bredd och avdelare */
 .pressure-left {
   display: flex;
   align-items: center;
-  min-width: 120px; /* Minimumbredd för vänstra delen */
+  min-width: 150px; /* Ökat från 120px för bättre läsbarhet vid fyrsiffriga värden */
+  border-right: 1px solid #e0e0e0; /* Lägg till en subtil avskiljare */
+  padding-right: 15px; /* Padding till höger om tryckvärdet */
 }
 
 .pressure-left .detail-icon {
@@ -194,12 +197,26 @@ h3 {
   color: #8e44ad; /* Lila färg för barometerikon */
 }
 
-/* NYTT: Lufttryck höger sida - UPPDATERAD */
+/* UPPDATERAD: Bättre symmetri för etiketter och värden */
+.pressure-left .detail-label {
+  font-size: 0.8rem;
+  color: var(--light-text);
+  margin-bottom: 5px; /* Ökat lite för bättre vertikalt avstånd */
+}
+
+/* Ge tryckvärdet mer utrymme */
+.pressure-left .detail-value {
+  font-weight: 600;
+  font-size: 1rem;
+  min-width: 90px; /* Garantera utrymme för fyrsiffriga värden */
+}
+
+/* UPPDATERAD: Lufttryck höger sida - justerad layout för symmetri */
 .pressure-right {
   display: flex;
-  align-items: flex-start; /* Ändrat från center för bättre textflöde */
+  align-items: center; /* Ändrat till center för bättre symmetri */
   flex: 1;
-  max-width: 65%; /* Ge mer utrymme för den längre texten */
+  padding-left: 5px; /* Lite padding för att balansera layouten */
 }
 
 .trend-container {
@@ -211,16 +228,15 @@ h3 {
 .trend-label {
   font-size: 0.8rem;
   color: var(--light-text);
-  margin-bottom: 4px;
+  margin-bottom: 5px; /* Anpassat för att matcha vänstra sidan */
 }
 
 /* Uppdaterad struktur för bättre linjering */
 .trend-value {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   font-weight: 600;
-  font-size: 1rem;
-  position: relative;
+  font-size: 1rem; /* Anpassat för att matcha vänstra sidan */
 }
 
 .trend-value i {
@@ -235,7 +251,7 @@ h3 {
   font-size: 0.8rem;
   color: var(--light-text);
   line-height: 1.2;
-  margin-top: 2px;
+  margin-top: 4px; /* Justerat avstånd */
   display: block;
   margin-left: 24px; /* Exakt samma bredd som ikon + margin-right */
 }
