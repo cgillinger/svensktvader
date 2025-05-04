@@ -313,6 +313,9 @@ async function processWeatherData(data) {
   // Uppdatera UI med aktuell väderinformation
   currentTempValue.textContent = temperature.toFixed(1);
   
+  // Tillämpa temperaturklass på aktuell temperatur
+  setTemperatureClass(currentTempValue, temperature);
+  
   // Använd väderikonklassen baserat på väderförhållanden och tid på dygnet
   await updateWeatherIcon(weatherSymbol);
   
@@ -488,6 +491,8 @@ function createDailyForecastItem(date, symbol, minTemp, maxTemp) {
   const maxTempElem = document.createElement('span');
   maxTempElem.className = 'daily-high';
   maxTempElem.textContent = `${maxTemp.toFixed(1)}°`;
+  // Tillämpa anpassad temperaturklass
+  setTemperatureClass(maxTempElem, maxTemp);
   
   // Separator
   const separator = document.createElement('span');
@@ -498,6 +503,8 @@ function createDailyForecastItem(date, symbol, minTemp, maxTemp) {
   const minTempElem = document.createElement('span');
   minTempElem.className = 'daily-low';
   minTempElem.textContent = `${minTemp.toFixed(1)}°`;
+  // Tillämpa anpassad temperaturklass
+  setTemperatureClass(minTempElem, minTemp);
   
   // Lägg till väderinformation
   const conditionElem = document.createElement('div');
@@ -756,18 +763,13 @@ function updateForecast(timeSeries) {
     tempElem.className = 'forecast-temp';
     // ÄNDRAT: Visa temperaturen med en decimal istället för noll decimaler
     tempElem.textContent = `${temp.toFixed(1)}°C`;
+    // Tillämpa temperaturklass baserat på värdet
+    setTemperatureClass(tempElem, temp);
     
     // Lägg till förhållandebeskrivning
     const conditionElem = document.createElement('div');
     conditionElem.className = 'forecast-condition';
     conditionElem.textContent = getShortWeatherDescription(symbol);
-    
-    // Lägg till temperaturfärgklass
-    if (temp <= 0) {
-      tempElem.classList.add('cold-temp');
-    } else if (temp >= 20) {
-      tempElem.classList.add('warm-temp');
-    }
     
     // Lägg till element till prognosobjekt
     forecastItem.appendChild(timeElem);
@@ -778,6 +780,32 @@ function updateForecast(timeSeries) {
     // Lägg till prognosobjektet i behållaren
     forecastItems.appendChild(forecastItem);
   }
+}
+
+/**
+ * Tilldelar CSS-klass baserat på temperatur för svenska förhållanden
+ * @param {Element} element - DOM-element att tilldela klass till
+ * @param {number} temperature - Temperaturvärde
+ */
+function setTemperatureClass(element, temperature) {
+  // Rensa befintliga temperaturklasser först
+  element.classList.remove('temp-very-cold', 'temp-cold', 'temp-mild', 'temp-warm', 'temp-hot');
+  
+  // Tilldela lämplig klass baserat på svenska förhållanden
+  if (temperature < 0) {
+    element.classList.add('temp-very-cold');  // Mörkblå för under 0°C
+  } else if (temperature >= 0 && temperature < 10) {
+    element.classList.add('temp-cold');       // Blå för 0-10°C
+  } else if (temperature >= 10 && temperature < 20) {
+    element.classList.add('temp-mild');       // Normal (svart) för 10-20°C
+  } else if (temperature >= 20 && temperature < 25) {
+    element.classList.add('temp-warm');       // Orange för 20-25°C
+  } else {
+    element.classList.add('temp-hot');        // Röd endast för 25°C+ (ovanligt i Sverige)
+  }
+  
+  // Spara också temperaturen som data-attribut för CSS-selektorer
+  element.setAttribute('data-temp', Math.floor(temperature));
 }
 
 /**
