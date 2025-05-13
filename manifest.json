@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Svenskt Väder",
+  "name": "Svenskt väder",
   "description": "Visar väderdata för orter i Sverige med information från SMHI",
   "version": "1.0.3",
   "default_locale": "sv",
@@ -17,7 +17,7 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "default_title": "Svenskt Väder"
+    "default_title": "Svenskt väder"
   },
   "background": {
     "service_worker": "background.js",

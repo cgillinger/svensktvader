@@ -1,6 +1,6 @@
-# 🌦️ Svenskt Väder – Microsoft Edge-tillägg
+# 🌦️ Svenskt väder – Microsoft Edge-tillägg
 
-Svenskt Väder är ett stilrent och funktionellt vädertillägg för Microsoft Edge som visar **uppdaterad väderdata från SMHI** för svenska orter. Tillägget innehåller dagliga prognoser, 9-timmarsprognoser, lufttrycksinformation, vindinformation, luftfuktighet, samt solens upp- och nedgång.
+Svenskt väder är ett stilrent och funktionellt vädertillägg för Microsoft Edge som visar **uppdaterad väderdata från SMHI** för svenska orter. Tillägget innehåller dagliga prognoser, 9-timmarsprognoser, lufttrycksinformation, vindinformation, luftfuktighet, samt solens upp- och nedgång.
 
 ---
 

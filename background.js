@@ -1,5 +1,5 @@
 // background.js
-// Bakgrundsskript för Svenskt Väder Edge-tillägg
+// Bakgrundsskript för Svenskt väder Edge-tillägg
 // Hanterar periodiska uppdateringar och notifikationer
 
 // Importera pressure-service.js
@@ -26,7 +26,7 @@ const STORAGE_KEYS = {
 
 // Konfigurera periodiska uppdateringar när tillägget installeras
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('Svenskt Väder installerat. Konfigurerar periodiska uppdateringar.');
+  console.log('Svenskt väder installerat. Konfigurerar periodiska uppdateringar.');
   setupPeriodicUpdates();
 });
 
