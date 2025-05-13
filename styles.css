@@ -1,19 +1,25 @@
 /* styles.css */
-/* Moderna stilar för Svenskt Väder Edge-tillägget - SLUTGILTIG VERSION */
+/* Frutiger Aero-inspirerad stilmall för Svenskt väder - FÖRENKLAD VERSION */
 
 :root {
-  --main-bg-color: #ffffff;  /* Vit bakgrund */
-  --card-bg-color: #ffffff;  /* Vit bakgrund för kort */
-  --forecast-item-bg: #ffffff; /* VIT bakgrund för prognoselement istället för grå */
+  --main-bg-color: linear-gradient(to bottom, #e6f2ff, #f9fdff);  /* Mjuk ljusblå gradient */
+  --card-bg-color: rgba(255, 255, 255, 0.9);  /* Nästan helt vit bakgrund för kort */
+  --glass-effect: rgba(255, 255, 255, 0.95);  /* Nästan vit glaseffekt */
   --primary-color: #0078d4;
-  --primary-color-light: #ffffff; /* Helt vit bakgrund för kort */
+  --primary-color-light: rgba(255, 255, 255, 0.9); /* Nästan vit bakgrund */
   --primary-color-dark: #0062a3;
-  --weather-panel-blue: #101010; /* Mörk svart för väderpanelen */
+  /* Förbättrad gradient för den blå panelen */
+  --weather-panel-blue: linear-gradient(180deg, 
+                         #4889c8 0%, 
+                         #3676ba 25%, 
+                         #2464a8 50%, 
+                         #1d5893 75%, 
+                         #154d82 100%); 
   --text-color: #212121; /* Mörkare svart text för bättre kontrast */
   --light-text: #505050; /* Mörkare grå för bättre läsbarhet */
-  --border-color: #000000; /* Svart för tydliga avgränsare */
-  --separator-color: #d0d0d0; /* Ljusgrå färg för subtila separatorer */
-  --accent-color: #0078d4;
+  --border-color: rgba(255, 255, 255, 0.9); /* Ljusare kanter för glaseffekt */
+  --separator-color: rgba(208, 208, 208, 0.8); /* Ljusgrå färg för subtila separatorer */
+  --accent-color: #2794eb;
   
   /* Anpassade temperaturintervall för svenskt klimat */
   --very-cold-color: #0047ab; /* Mörkblå för under 0°C */
@@ -22,26 +28,35 @@
   --warm-color: #ff8c00; /* Orange för 20-25°C */
   --hot-color: #ff4500; /* Röd endast för över 25°C */
   
-  --shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Mer distinkt skugga */
+  --aero-shadow: 0 4px 20px rgba(0, 120, 212, 0.2); /* Mjuk blåtonad skugga */
+  --panel-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); /* Mjukare skugga för paneler */
   --panel-radius: 12px;
-  --item-radius: 8px;
+  --item-radius: 10px;
   --sunrise-color: #FFB700; /* Mer intensiv gul för soluppgång */
   --sunset-color: #FF6E00; /* Mer intensiv orange för solnedgång */
+  
+  /* Glossy effekter - förbättrade */
+  --glossy-effect: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.0) 51%, rgba(255,255,255,0.0) 100%);
+  --button-gloss: linear-gradient(to bottom, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.0) 51%, rgba(255,255,255,0.0) 100%);  
+  --reflective-edge: 0 1px 0 rgba(255, 255, 255, 0.6); /* Ljus kant för reflektionseffekt */
 }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: var(--main-bg-color);
+  background: var(--main-bg-color);
   color: var(--text-color);
-  width: 420px; /* ÄNDRAD: Breddad från 380px till 420px för att få plats med fler prognoser */
+  width: 420px;
   max-height: 600px;
   overflow-y: auto;
+  background-attachment: fixed;
 }
 
 .container {
   padding: 15px;
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== HEADER ===== */
@@ -49,6 +64,17 @@ header {
   margin-bottom: 15px;
   border-bottom: 1px solid var(--separator-color);
   padding-bottom: 10px;
+  position: relative;
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--reflective-edge);
 }
 
 .top-bar {
@@ -63,12 +89,14 @@ h1 {
   margin: 0;
   color: var(--primary-color);
   font-weight: 600;
+  text-shadow: var(--reflective-edge);
 }
 
 h3 {
   font-size: 1.1rem;
   margin: 0 0 10px 0;
   color: var(--text-color);
+  text-shadow: var(--reflective-edge);
 }
 
 /* ===== LOADING STATE ===== */
@@ -83,6 +111,7 @@ h3 {
   display: block;
   color: var(--primary-color);
   animation: pulse 1.5s infinite ease-in-out;
+  text-shadow: 0 0 15px rgba(0, 120, 212, 0.4);
 }
 
 @keyframes pulse {
@@ -95,14 +124,32 @@ h3 {
 .weather-container {
   background-color: var(--card-bg-color);
   border-radius: var(--panel-radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--panel-shadow);
   overflow: hidden;
-  border: 1px solid var(--separator-color);
+  border: 1px solid var(--border-color);
+  position: relative;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.weather-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  background: var(--glossy-effect);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.7;
 }
 
 .location-display {
   padding: 10px 20px 0;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .location-display h2 {
@@ -111,61 +158,84 @@ h3 {
   font-weight: 500;
   color: var(--text-color);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-shadow: var(--reflective-edge);
 }
 
-/* Den svarta panelen med rundade hörn - ÄNDRAD: Förbättrad centrering */
+/* Den blåa panelen med rundade hörn - FÖRBÄTTRAD */
 .current-weather {
-  padding: 15px;
+  padding: 15px 15px 35px; /* Extra padding i botten för luftfuktighet */
   text-align: center;
-  background-color: var(--weather-panel-blue);
+  background: var(--weather-panel-blue);
   color: white;
   border-radius: var(--item-radius);
   margin: 10px 15px;
   position: relative;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Starkare skugga för djupeffekt */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  align-items: center; /* TILLAGT: Centrerar alla element i flex-column */
+  align-items: center;
   justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Glaseffekt på den blå panelen */
+.current-weather::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: var(--glossy-effect);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .weather-icon {
   display: flex;
-  justify-content: center; /* TILLAGT: Explicit centrering */
-  width: 100%; /* TILLAGT: Full bredd för att centrera ordentligt */
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  z-index: 3;
+  margin-bottom: 5px;
 }
 
 .weather-icon i {
   font-size: 3.7rem;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  color: #ffdd22; /* Klarare gul för bättre synlighet */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  color: #ffdd22;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 0, 0.4));
 }
 
-/* KORRIGERAD CELSIUS: Säkerställer att temperaturtexten är vit utan att lägga till °C */
 .current-temp {
   font-size: 2.8rem;
   font-weight: bold;
-  margin: 5px 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 0 0 8px 0; /* Ökat bottenmarginalen för att skapa avstånd till beskrivningen */
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   text-align: center;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white !important; /* Ändrat till vitt för bättre synlighet på svart bakgrund */
+  color: white !important;
+  position: relative;
+  z-index: 3;
 }
-
-/* BORTTAGET: ::after pseudo-element som lade till en extra °C */
 
 .weather-description {
   font-size: 1.1rem;
-  margin-top: 5px;
+  margin-top: 0; /* Minskat marginal för att skapa avstånd till temperaturen */
+  margin-bottom: 8px;
   font-weight: 500;
-  text-align: center; /* TILLAGT: Explicit text-centrering */
-  width: 100%; /* TILLAGT: Full bredd för att centrera ordentligt */
+  text-align: center;
+  width: 100%;
+  position: relative;
+  z-index: 3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Extra korrigering för att säkerställa centrering av temperaturen */
 .current-temp::before {
   content: "";
   display: block;
@@ -173,27 +243,31 @@ h3 {
   visibility: hidden;
 }
 
-/* Även dolda delar av current-temp elementet */
 .current-temp span, 
 .current-temp label,
 .current-temp div {
   color: white !important;
 }
 
-/* Luftfuktighet i den svarta panelen */
+/* FIXAD LUFTFUKTIGHET POSITION */
 .humidity-display {
   position: absolute;
-  bottom: 10px;
-  right: 15px;
+  bottom: 6px; /* Justerat position längre ner */
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   font-size: 0.9rem;
+  z-index: 3;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  padding: 5px 0; /* Lagt till padding för att förhindra att texten klipps */
 }
 
 .humidity-display i {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-right: 5px;
-  color: #f0f0f0;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* ===== WEATHER DETAILS ===== */
@@ -202,7 +276,9 @@ h3 {
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   padding: 12px;
-  border-bottom: 1px solid var(--separator-color); /* Tunnare avgränsare */
+  border-bottom: 1px solid var(--separator-color);
+  position: relative;
+  z-index: 1;
 }
 
 .detail {
@@ -211,207 +287,248 @@ h3 {
   padding: 10px;
   background-color: var(--primary-color-light);
   border-radius: var(--item-radius);
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   min-height: 60px;
-  border: 1px solid var(--separator-color); /* Lägg till tunn ram */
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Glaseffekt på detaljer */
+.detail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: var(--glossy-effect);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .detail:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Tydligare hover-effekt */
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* UPPDATERAD: Tvåspaltig detalj - mer mellanrum mellan spalterna */
 .two-column-detail {
   display: flex;
   justify-content: space-between;
   grid-column: span 2;
-  gap: 15px; /* Ökat mellanrum mellan vänster och höger sida */
-  border: 1px solid var(--separator-color);
+  gap: 15px;
+  border: 1px solid var(--border-color);
 }
 
-/* UPPDATERAD: Lufttryck vänster sida - ökad bredd och avdelare */
 .pressure-left {
   display: flex;
   align-items: center;
-  min-width: 150px; /* Ökat från 120px för bättre läsbarhet vid fyrsiffriga värden */
-  border-right: 1px solid var(--separator-color); /* Ändrad till en tunnare, subtil avdelare */
-  padding-right: 15px; /* Padding till höger om tryckvärdet */
+  min-width: 150px;
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  padding-right: 15px;
+  position: relative;
+  z-index: 1;
 }
 
 .pressure-left .detail-icon {
   flex: 0 0 40px;
   text-align: center;
+  position: relative;
 }
 
 .pressure-left .detail-icon i {
   font-size: 1.8rem;
-  color: #8e44ad; /* Behåll lila färg för barometerikon */
+  color: #9b59b6;
+  text-shadow: 0 0 8px rgba(155, 89, 182, 0.3);
 }
 
-/* UPPDATERAD: Bättre symmetri för etiketter och värden */
 .pressure-left .detail-label {
   font-size: 0.8rem;
   color: var(--light-text);
-  margin-bottom: 5px; /* Ökat lite för bättre vertikalt avstånd */
+  margin-bottom: 5px;
 }
 
-/* Ge tryckvärdet mer utrymme */
 .pressure-left .detail-value {
   font-weight: 600;
   font-size: 1rem;
-  min-width: 90px; /* Garantera utrymme för fyrsiffriga värden */
+  min-width: 90px;
 }
 
-/* UPPDATERAD: Lufttryck höger sida - justerad layout för symmetri */
 .pressure-right {
   display: flex;
-  align-items: center; /* Ändrat till center för bättre symmetri */
+  align-items: center;
   flex: 1;
-  padding-left: 5px; /* Lite padding för att balansera layouten */
+  padding-left: 5px;
+  position: relative;
+  z-index: 1;
 }
 
 .trend-container {
   display: flex;
   flex-direction: column;
-  width: 100%; /* Användning av full bredd */
+  width: 100%;
 }
 
 .trend-label {
   font-size: 0.8rem;
   color: var(--light-text);
-  margin-bottom: 5px; /* Anpassat för att matcha vänstra sidan */
+  margin-bottom: 5px;
 }
 
-/* Uppdaterad struktur för bättre linjering */
 .trend-value {
   display: flex;
   align-items: center;
   font-weight: 600;
-  font-size: 1rem; /* Anpassat för att matcha vänstra sidan */
+  font-size: 1rem;
 }
 
 .trend-value i {
   margin-right: 6px;
-  flex-shrink: 0; /* Förhindra att ikonen krymper */
-  width: 18px; /* Fast bredd för ikonen */
+  flex-shrink: 0;
+  width: 18px;
   text-align: center;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Komplett omskrivning för trend-description */
 .trend-description {
   font-size: 0.8rem;
   color: var(--light-text);
   line-height: 1.2;
-  margin-top: 4px; /* Justerat avstånd */
+  margin-top: 4px;
   display: block;
-  margin-left: 24px; /* Exakt samma bredd som ikon + margin-right */
+  margin-left: 24px;
 }
 
-/* Soluppgång/solnedgång tillsammans på rad men separata ikoner */
 .sun-times {
   grid-column: span 2;
   display: flex;
   justify-content: space-between;
   padding: 12px 15px;
   background-color: var(--primary-color-light);
-  border: 1px solid var(--separator-color);
+  border: 1px solid var(--border-color);
 }
 
-/* UPPDATERAD: Bättre centrering av soluppgång/solnedgång ikoner */
 .sunrise-container, .sunset-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 80px; /* Fast höjd för bättre kontroll över mellanrum */
+  height: 80px;
+  position: relative;
+  z-index: 1;
 }
 
-/* Nya stilar för sol-etiketter */
 .sun-label {
-  font-size: 0.8rem; /* Något större för bättre läsbarhet */
+  font-size: 0.8rem;
   color: var(--light-text);
-  margin-bottom: 0; /* Ta bort margin för bättre positionering */
+  margin-bottom: 0;
+  text-shadow: var(--reflective-edge);
 }
 
-/* UPPDATERAD: Basklass för sol-ikoner med bättre positionering */
 .sun-times .sun-icon {
-  font-size: 1.8rem; /* Något större ikoner */
-  margin: 8px 0; /* Jämnt mellanrum ovanför och under */
+  font-size: 1.8rem;
+  margin: 8px 0;
+  filter: drop-shadow(0 0 5px rgba(255, 183, 0, 0.3));
 }
 
-/* Separata färger för soluppgång (gul) och solnedgång (orange) */
 .sunrise-container .sun-icon, 
 .wi-sunrise {
-  color: var(--sunrise-color) !important; /* Klarare gul för soluppgång */
+  color: var(--sunrise-color) !important;
+  text-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
 }
 
 .sunset-container .sun-icon,
 .wi-sunset {
-  color: var(--sunset-color) !important; /* Klarare orange för solnedgång */
+  color: var(--sunset-color) !important;
+  text-shadow: 0 0 8px rgba(255, 110, 0, 0.3);
 }
 
 .sun-times .time-value {
   font-weight: 600;
-  font-size: 1.1rem; /* Något större för bättre läsbarhet */
-  margin-top: 0; /* Ta bort margin för bättre positionering */
+  font-size: 1.1rem;
+  margin-top: 0;
+  text-shadow: var(--reflective-edge);
 }
 
 .detail-icon {
   flex: 0 0 40px;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .detail-icon i {
   font-size: 1.8rem;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Vindriktningsikon centrerad */
 .direction-icon {
   display: inline-block;
   transform-origin: center center;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.1));
 }
 
 .detail-info {
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .detail-label {
   font-size: 0.8rem;
   color: var(--light-text);
   margin-bottom: 2px;
+  text-shadow: var(--reflective-edge);
 }
 
 .detail-value {
   font-weight: 600;
   font-size: 1rem;
+  text-shadow: var(--reflective-edge);
 }
 
 /* ===== FORECAST ===== */
-/* UPPDATERAD: Mer kompakta prognosbrickor som ryms utan scrollning */
 .forecast-container h2, .daily-forecast-container h2 {
   font-size: 1.1rem;
-  margin: 0 0 5px 0; /* Minskad marginal under för att spara utrymme */
+  margin: 0 0 5px 0;
   font-weight: 500;
+  text-shadow: var(--reflective-edge);
+  position: relative;
+  z-index: 1;
 }
 
 .forecast-container, .daily-forecast-container {
-  padding: 10px 12px; /* Minskad vertikal padding för att spara utrymme */
-  border-top: 1px solid var(--separator-color); /* Tunnare avgränsare */
+  padding: 10px 12px;
+  border-top: 1px solid var(--separator-color);
+  position: relative;
+}
+
+.forecast-container::after, .daily-forecast-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--reflective-edge);
 }
 
 .forecast, .daily-forecast {
   display: flex;
   overflow-x: auto;
-  padding-bottom: 5px; /* Minskad padding under scrollbar */
+  padding-bottom: 5px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
-  flex-wrap: nowrap; /* Säkerställ att prognosobjekt inte wrappas */
-  justify-content: space-between; /* TILLAGT: Jämn fördelning av utrymme för prognosobjekten */
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
 }
 
 .forecast::-webkit-scrollbar, .daily-forecast::-webkit-scrollbar {
-  height: 4px; /* Tunnare scrollbar */
+  height: 4px;
 }
 
 .forecast::-webkit-scrollbar-thumb, .daily-forecast::-webkit-scrollbar-thumb {
@@ -423,33 +540,46 @@ h3 {
   background: transparent;
 }
 
-/* UPPDATERAD: Prognosobjekten använder nu procent av bredden istället för fasta pixlar */
 .forecast-item, .daily-forecast-item {
-  flex: 1; /* ÄNDRAD: Använd flex grow för att fylla tillgängligt utrymme */
-  max-width: 23%; /* TILLAGT: Begränsa maxbredd till ca en fjärdedel av tillgängligt utrymme */
-  min-width: 70px; /* TILLAGT: Säkerställ minsta bredd för läsbarhet */
+  flex: 1;
+  max-width: 23%;
+  min-width: 70px;
   text-align: center;
   padding: 8px 4px;
-  margin: 0 5px; /* ÄNDRAD: Mindre marginal på sidorna */
-  background-color: var(--forecast-item-bg);
+  margin: 0 5px;
+  background-color: var(--glass-effect);
   border-radius: var(--item-radius);
   transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--separator-color);
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Första objektet behöver ingen vänster-marginal */
+/* Glaseffekt på prognosobjekt */
+.forecast-item::before, .daily-forecast-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: var(--glossy-effect);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 .forecast-item:first-child, .daily-forecast-item:first-child {
   margin-left: 0;
 }
 
-/* Sista objektet behöver ingen höger-marginal */
 .forecast-item:last-child, .daily-forecast-item:last-child {
   margin-right: 0;
 }
 
-/* UPPDATERAD: Justerade höjder för prognosobjekt för att visa mer information */
 .forecast-item {
   height: 110px;
 }
@@ -460,74 +590,91 @@ h3 {
 
 .forecast-item:hover, .daily-forecast-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Tydligare hover-effekt */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* UPPDATERAD: Mindre text och marginaler i prognosobjekt */
 .forecast-time {
-  font-size: 0.75rem; /* Mindre text */
-  margin-bottom: 3px; /* Minskad marginal */
+  font-size: 0.75rem;
+  margin-bottom: 3px;
   color: var(--light-text);
   font-weight: 500;
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
 .forecast-icon i, .daily-icon i {
-  font-size: 1.7rem; /* Något mindre ikoner för att spara utrymme */
-  margin: 3px 0; /* Minskade marginaler */
+  font-size: 1.7rem;
+  margin: 3px 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
 }
 
-/* UPPDATERAD: Temperaturvisning i prognoser */
 .forecast-temp {
   font-weight: bold;
-  margin-top: 3px; /* Minskad marginal */
-  font-size: 0.9rem; /* Något mindre text */
+  margin-top: 3px;
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
-/* UPPDATERAD: Mindre text i prognos-förhållanden */
 .forecast-condition, .daily-condition {
-  font-size: 0.7rem; /* Mindre text */
+  font-size: 0.7rem;
   color: var(--light-text);
-  margin-top: 3px; /* Minskad marginal */
+  margin-top: 3px;
   line-height: 1.2;
   flex: 1;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
-/* ===== DAGSPROGNOSER SPECIALSTIL ===== */
-/* UPPDATERAD: Mindre text och marginaler i dagsprognoser */
+/* ===== DAGSPROGNOSER ===== */
 .daily-date {
   font-weight: 500;
-  font-size: 0.85rem; /* Mindre text */
-  margin-bottom: 2px; /* Minskad marginal */
+  font-size: 0.85rem;
+  margin-bottom: 2px;
   color: var(--text-color);
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
 .daily-day {
-  font-size: 0.75rem; /* Mindre text */
+  font-size: 0.75rem;
   color: var(--light-text);
-  margin-bottom: 5px; /* Minskad marginal */
+  margin-bottom: 5px;
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
 .daily-temp-range {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4px; /* Mindre gap mellan temperaturer */
-  margin-top: 3px; /* Minskad marginal */
+  gap: 4px;
+  margin-top: 3px;
+  position: relative;
+  z-index: 1;
 }
 
-/* UPPDATERAD: Mindre text i temperaturområden */
 .daily-high {
   font-weight: bold;
-  font-size: 0.85rem; /* Mindre text */
+  font-size: 0.85rem;
+  text-shadow: var(--reflective-edge);
 }
 
 .daily-low {
-  font-size: 0.8rem; /* Mindre text */
-  color: var(--cold-color); /* Alltid blå för min-temperatur */
+  font-size: 0.8rem;
+  color: var(--cold-color);
+  text-shadow: var(--reflective-edge);
 }
 
 .daily-separator {
@@ -540,12 +687,14 @@ h3 {
   text-align: center;
   padding: 30px 0;
   color: #d83b01;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .error-message .wi {
   font-size: 3rem;
   margin-bottom: 10px;
   display: block;
+  text-shadow: 0 0 10px rgba(216, 59, 1, 0.3);
 }
 
 /* ===== FOOTER ===== */
@@ -556,20 +705,32 @@ footer {
   color: var(--light-text);
   border-top: 1px solid var(--separator-color);
   padding-top: 10px;
+  position: relative;
+}
+
+footer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--reflective-edge);
+}
+
+footer p {
+  text-shadow: var(--reflective-edge);
 }
 
 /* ===== TEMPERATURE COLORS ===== */
-/* VIKTIGT! Anpassad färgskala för svenska temperaturer */
 .forecast-temp, .daily-high {
-  color: var(--mild-color); /* Standardfärg (svart) för temperaturer */
+  color: var(--mild-color);
 }
 
-/* För temperaturer under 0°C */
 .temp-below-zero {
   color: var(--very-cold-color) !important;
 }
 
-/* För temperaturer 0-10°C */
 .cold-temp, 
 .forecast-temp[data-temp^="-"], 
 .forecast-temp[data-temp="0"], 
@@ -585,7 +746,6 @@ footer {
   color: var(--cold-color);
 }
 
-/* För temperaturer 20-25°C (Svenskt "varmt") */
 .warm-temp, 
 .forecast-temp[data-temp="20"], 
 .forecast-temp[data-temp="21"], 
@@ -595,7 +755,6 @@ footer {
   color: var(--warm-color);
 }
 
-/* För temperaturer över 25°C (Svenskt "mycket varmt") */
 .hot-temp, 
 .forecast-temp[data-temp="25"], 
 .forecast-temp[data-temp="26"], 
@@ -607,19 +766,16 @@ footer {
   color: var(--hot-color);
 }
 
-/* Speciella selektorer för dagsprognoser */
-/* Dessa kommer inte använda data-attribut utan behöver JavaScript-ändringar */
-/* Klass-baserade stilar som kan användas i JavaScript */
-.temp-very-cold { color: var(--very-cold-color) !important; }  /* Under 0°C */
-.temp-cold { color: var(--cold-color) !important; }            /* 0-10°C */
-.temp-mild { color: var(--mild-color) !important; }            /* 10-20°C */
-.temp-warm { color: var(--warm-color) !important; }            /* 20-25°C */
-.temp-hot { color: var(--hot-color) !important; }              /* Över 25°C */
+.temp-very-cold { color: var(--very-cold-color) !important; }
+.temp-cold { color: var(--cold-color) !important; }
+.temp-mild { color: var(--mild-color) !important; }
+.temp-warm { color: var(--warm-color) !important; }
+.temp-hot { color: var(--hot-color) !important; }
 
 /* ===== BUTTONS ===== */
 .settings-button {
-  background-color: transparent;
-  border: none;
+  background-color: rgba(0, 120, 212, 0.1);
+  border: 1px solid var(--border-color);
   color: var(--primary-color);
   cursor: pointer;
   font-size: 1.2rem;
@@ -628,28 +784,67 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.settings-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: var(--button-gloss);
+  z-index: 0;
+}
+
+.settings-button i {
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
 .settings-button:hover {
-  background-color: rgba(0, 120, 212, 0.1);
+  background-color: rgba(0, 120, 212, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .primary-button {
-  background-color: var(--primary-color);
+  background: linear-gradient(to bottom, #0088e9, #0062a3);
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   padding: 10px 16px;
   border-radius: var(--item-radius);
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: all 0.2s;
   margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.primary-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: var(--button-gloss);
+  z-index: 0;
+  opacity: 0.8;
 }
 
 .primary-button:hover {
-  background-color: var(--primary-color-dark);
+  background: linear-gradient(to bottom, #0095ff, #0069b3);
   transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
 }
 
 .close-button {
@@ -669,6 +864,10 @@ footer {
   color: var(--text-color);
 }
 
+.close-button i {
+  text-shadow: var(--reflective-edge);
+}
+
 /* ===== SETTINGS PANEL ===== */
 .settings-panel {
   position: absolute;
@@ -676,14 +875,29 @@ footer {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--card-bg-color);
+  background: var(--main-bg-color);
   z-index: 100;
   padding: 15px;
   border-radius: var(--panel-radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--panel-shadow);
   overflow-y: auto;
   animation: slideIn 0.3s forwards;
-  border: 1px solid var(--separator-color);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.settings-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20%;
+  background: var(--glossy-effect);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.8;
 }
 
 @keyframes slideIn {
@@ -698,42 +912,62 @@ footer {
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--separator-color);
+  position: relative;
+  z-index: 1;
+}
+
+.settings-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--reflective-edge);
 }
 
 .settings-header h2 {
   margin: 0;
   font-size: 1.3rem;
+  text-shadow: var(--reflective-edge);
 }
 
 .setting-item {
   margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .setting-item label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
+  text-shadow: var(--reflective-edge);
 }
 
 .setting-item input[type="text"], .setting-item select {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--separator-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--item-radius);
   font-size: 0.9rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .setting-item input[type="text"]:focus, .setting-item select:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.2);
+  box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.2), 0 3px 10px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .setting-description {
   margin-top: 5px;
   font-size: 0.8rem;
   color: var(--light-text);
+  text-shadow: var(--reflective-edge);
 }
 
 .setting-description a {
@@ -744,6 +978,8 @@ footer {
 .setting-actions {
   margin-top: 20px;
   margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== RADIO BUTTONS ===== */
@@ -756,6 +992,7 @@ footer {
   align-items: center;
   margin-bottom: 10px;
   cursor: pointer;
+  text-shadow: var(--reflective-edge);
 }
 
 .radio-label input[type="radio"] {
@@ -769,11 +1006,33 @@ footer {
 }
 
 .attribution-box {
-  background-color: var(--primary-color-light);
+  background-color: var(--glass-effect);
   padding: 12px;
   border-radius: var(--item-radius);
-  border: 1px solid var(--separator-color);
+  border: 1px solid var(--border-color);
   font-size: 0.85rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.attribution-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: var(--glossy-effect);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.attribution-box p, .attribution-box ul, .attribution-box li {
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
 .attribution-box ul {
@@ -798,6 +1057,7 @@ footer {
   color: var(--light-text);
   font-size: 0.8rem;
   margin-top: 8px;
+  text-shadow: var(--reflective-edge);
 }
 
 /* ===== WEATHER ICON COLORS ===== */
@@ -841,27 +1101,27 @@ footer {
 .wi-strong-wind { color: #1A5276; } /* Starkare Dark Blue */
 
 /* Specifika ikoner för Beaufort-skalan */
-.wi-wind-beaufort-0 { color: #85C1E9; } /* Stiltje - klarare */
+.wi-wind-beaufort-0 { color: #85C1E9; text-shadow: 0 0 5px rgba(133, 193, 233, 0.5); } /* Stiltje - klarare */
 .wi-wind-beaufort-1, 
 .wi-wind-beaufort-2, 
-.wi-wind-beaufort-3 { color: #3498DB; } /* Lätt vind - klarare */
+.wi-wind-beaufort-3 { color: #3498DB; text-shadow: 0 0 5px rgba(52, 152, 219, 0.5); } /* Lätt vind - klarare */
 .wi-wind-beaufort-4, 
 .wi-wind-beaufort-5, 
-.wi-wind-beaufort-6 { color: #2471A3; } /* Måttlig/frisk vind - klarare */
+.wi-wind-beaufort-6 { color: #2471A3; text-shadow: 0 0 5px rgba(36, 113, 163, 0.5); } /* Måttlig/frisk vind - klarare */
 .wi-wind-beaufort-7, 
-.wi-wind-beaufort-8 { color: #0000CD; } /* Kuling - klarare */
+.wi-wind-beaufort-8 { color: #0000CD; text-shadow: 0 0 5px rgba(0, 0, 205, 0.5); } /* Kuling - klarare */
 .wi-wind-beaufort-9, 
 .wi-wind-beaufort-10, 
 .wi-wind-beaufort-11, 
-.wi-wind-beaufort-12 { color: #C0392B; } /* Storm/orkan - klarare */
+.wi-wind-beaufort-12 { color: #C0392B; text-shadow: 0 0 5px rgba(192, 57, 43, 0.5); } /* Storm/orkan - klarare */
 
 /* Speciella */
-.wi-dust { color: #F9E79F; } /* Klarare Khaki */
-.wi-smoke { color: #CD6155; } /* Klarare Rosy Brown */
-.wi-smog { color: #FCF3CF; } /* Klarare Light Yellow */
+.wi-dust { color: #F9E79F; text-shadow: 0 0 5px rgba(249, 231, 159, 0.5); } /* Klarare Khaki */
+.wi-smoke { color: #CD6155; text-shadow: 0 0 5px rgba(205, 97, 85, 0.5); } /* Klarare Rosy Brown */
+.wi-smog { color: #FCF3CF; text-shadow: 0 0 5px rgba(252, 243, 207, 0.5); } /* Klarare Light Yellow */
 
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
-@media (max-width: 420px) { /* ÄNDRAT: Uppdaterad för ny bredd */
+@media (max-width: 420px) {
   .weather-details {
     grid-template-columns: 1fr;
   }
@@ -878,66 +1138,87 @@ footer {
   align-items: center;
   padding: 8px 12px;
   border-radius: var(--item-radius);
-  background-color: var(--primary-color-light);
+  background-color: var(--glass-effect);
   font-size: 0.85rem;
-  border: 1px solid var(--separator-color);
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.api-key-status::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: var(--glossy-effect);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .status-icon {
   margin-right: 8px;
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .status-icon i {
   font-size: 1rem;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Statusfärger */
-.status-info {
-  color: #0078d4;
-  background-color: #e3f2fd;
-}
-
-.status-success {
-  color: #2e7d32;
-  background-color: #e8f5e9;
+#api-key-message {
+  position: relative;
+  z-index: 1;
+  text-shadow: var(--reflective-edge);
 }
 
 .api-key-status.valid {
-  background-color: #e8f5e9;
-  border-color: #66BB6A;
+  background: linear-gradient(to bottom, rgba(232, 245, 233, 0.8), rgba(220, 237, 222, 0.8));
+  border-color: rgba(102, 187, 106, 0.7);
 }
 
 .api-key-status.valid .status-icon i {
   color: #2e7d32;
+  text-shadow: 0 0 5px rgba(46, 125, 50, 0.3);
 }
 
 .api-key-status.invalid {
-  background-color: #fdeded;
-  border-color: #EF5350;
+  background: linear-gradient(to bottom, rgba(253, 237, 237, 0.8), rgba(248, 215, 215, 0.8));
+  border-color: rgba(239, 83, 80, 0.7);
 }
 
 .api-key-status.invalid .status-icon i {
   color: #d32f2f;
+  text-shadow: 0 0 5px rgba(211, 47, 47, 0.3);
 }
 
-/* Färger för olika trender */
+/* Färger för olika trender med glödeffekt */
 .wi-direction-up {
-  color: #4caf50; /* Behåll grönt för stigande */
+  color: #4caf50;
+  text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
 }
 
 .wi-direction-down {
-  color: #f44336; /* Behåll rött för fallande */
+  color: #f44336;
+  text-shadow: 0 0 8px rgba(244, 67, 54, 0.4);
 }
 
 .wi-direction-right {
-  color: #ff9800; /* Behåll gul/orange för stabilt */
+  color: #ff9800;
+  text-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
 }
 
 /* EXTRA KORRIGERINGAR FÖR TEMPERATURCENTRERING */
 .current-weather * {
   float: none !important;
+  position: relative;
+  z-index: 3; /* Ökad z-index för att vara framför alla bakgrundslager */
 }
 
 .current-temp,
@@ -952,12 +1233,4 @@ footer {
   align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
-}
-
-.weather-description {
-  text-align: center !important;
-  width: 100% !important;
-  display: block !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
 }
