@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Svenskt väder",
   "description": "Visar väderdata för orter i Sverige med information från SMHI",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "default_locale": "sv",
   "permissions": ["storage", "alarms"],
   "host_permissions": [

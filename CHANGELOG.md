@@ -1,5 +1,8 @@
 Changelog - Svenskt väder
 
+## 1.0.5
+ - Nya orter tillagda
+
 ## 1.0.4
 ### Förbättringar
 - Rättad stavning i appens titel ("Svenskt Väder" → "Svenskt väder")
