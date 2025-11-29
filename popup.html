@@ -50,6 +50,20 @@
           </div>
         </div>
 
+        <!-- NY: UV-index panel direkt under temperaturen -->
+        <div class="uv-index-bar" id="uv-index-bar" style="display: none;">
+          <div class="uv-icon-wrapper">
+            <i class="fas fa-sun uv-sun-icon" id="uv-sun-icon"></i>
+          </div>
+          <div class="uv-info">
+            <div class="uv-label">UV-index</div>
+            <div class="uv-value" id="uv-value">--</div>
+          </div>
+          <div class="uv-risk-info">
+            <div class="uv-risk-text" id="uv-risk-text">--</div>
+          </div>
+        </div>
+
         <!-- Omdesignade väderdetaljer med tydliga etiketter -->
         <div class="weather-details">
           <div class="detail">
@@ -74,7 +88,7 @@
             </div>
           </div>
           
-          <!-- ÄNDRAT: Lufttryckspanel med uppdaterad layout -->
+          <!-- Lufttryckspanel med uppdaterad layout -->
           <div class="detail pressure-detail two-column-detail">
             <div class="pressure-left">
               <div class="detail-icon">
@@ -122,7 +136,7 @@
           </div>
         </div>
         
-        <!-- NY SEKTION: Dagsprognoser -->
+        <!-- Dagsprognoser -->
         <div class="daily-forecast-container">
           <h2>4-dagarsprognos</h2>
           <div class="daily-forecast" id="daily-forecast-items">
@@ -176,6 +190,30 @@
               <input type="radio" name="wind-scale" value="textsea"> 
               Beskrivande (Bris, Kuling, etc.)
             </label>
+          </div>
+        </div>
+        
+        <!-- NY SEKTION: UV-index information -->
+        <div class="setting-item uv-info-section">
+          <h3><i class="fas fa-sun"></i> UV-index Information</h3>
+          <div class="info-box">
+            <p><strong>UV-index visar strålningens styrka från solen.</strong></p>
+            <p>Data hämtas automatiskt från <a href="https://currentuvindex.com/" target="_blank">CurrentUVIndex.com</a> - en kostnadsfri tjänst som inte kräver registrering eller API-nyckel.</p>
+            
+            <div class="uv-scale-guide">
+              <p><strong>Risknivåer enligt Strålsäkerhetsmyndigheten:</strong></p>
+              <ul class="uv-levels-list">
+                <li><span class="uv-dot uv-low"></span> <strong>0-2:</strong> Låg UV-risk</li>
+                <li><span class="uv-dot uv-moderate"></span> <strong>3-5:</strong> Måttlig UV-risk</li>
+                <li><span class="uv-dot uv-high"></span> <strong>6-7:</strong> Hög UV-risk</li>
+                <li><span class="uv-dot uv-very_high"></span> <strong>8-10:</strong> Mycket hög UV-risk</li>
+                <li><span class="uv-dot uv-extreme"></span> <strong>11+:</strong> Extrem UV-risk</li>
+              </ul>
+            </div>
+            
+            <p class="uv-note"><em>OBS: UV-index uppdateras var 6:e timme och cachar automatiskt. Värdet visar dagens förväntade maximum.</em></p>
+            
+            <p class="uv-attribution">Data: <a href="https://currentuvindex.com/api" target="_blank">CurrentUVIndex.com API</a> (CC BY 4.0)</p>
           </div>
         </div>
         

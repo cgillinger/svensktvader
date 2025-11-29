@@ -2,8 +2,9 @@
 // Bakgrundsskript för Svenskt väder Edge-tillägg
 // Hanterar periodiska uppdateringar och notifikationer
 
-// Importera pressure-service.js
+// Importera pressure-service.js och uv-service.js
 import { getPressureData, buildLocationStationMap } from './pressure-service.js';
+import { getUVData, cleanOldUVCache } from './uv-service.js';
 import swedishLocations from './locations.js';
 
 // Konstanter
@@ -39,6 +40,9 @@ function setupPeriodicUpdates() {
   
   // Lägg till veckovis uppdatering av stationsdata
   chrome.alarms.create('updateStations', { periodInMinutes: 7 * 24 * 60 }); // En gång per vecka
+  
+  // NY: Lägg till veckovis rensning av UV-cache
+  chrome.alarms.create('cleanUVCache', { periodInMinutes: 7 * 24 * 60 }); // En gång per vecka
 }
 
 // Lyssna efter alarm och uppdatera väderdata
@@ -52,6 +56,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   } else if (alarm.name === 'updateStations') {
     console.log('Alarm utlöst. Uppdaterar stationsdata.');
     updateStationsData();
+  } else if (alarm.name === 'cleanUVCache') {
+    console.log('Alarm utlöst. Rensar gammal UV-cache.');
+    cleanOldUVCache();
   }
 });
 
@@ -82,9 +89,15 @@ function updateWeatherData() {
       })
       .then(pressureData => {
         console.log('Lufttrycksdata uppdaterad:', pressureData);
+        
+        // Hämta och spara UV-data
+        return getUVData(locationName, parseFloat(lat), parseFloat(lon));
+      })
+      .then(uvData => {
+        console.log('UV-data uppdaterad:', uvData);
       })
       .catch(error => {
-        console.error('Fel vid uppdatering av väder- eller lufttrycksdata:', error);
+        console.error('Fel vid uppdatering av väder-, lufttrycks- eller UV-data:', error);
       });
   });
 }

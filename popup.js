@@ -1,8 +1,9 @@
 // popup.js
-// Uppdaterat huvudskript för Svenskt Väder Edge-tillägg
+// Uppdaterat huvudskript för Svenskt Väder Edge-tillägg med UV-index
 
 import swedishLocations from './locations.js';
 import { getPressureData } from './pressure-service.js';
+import { getUVData } from './uv-service.js';
 
 // Konstanter
 const SMHI_API_BASE = 'https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point';
@@ -14,10 +15,11 @@ const STORAGE_KEYS = {
   WEATHER_DATA: 'weatherData',
   API_KEY: 'ipGeolocationApiKey',
   WIND_SCALE: 'windScale',
-  // Nya nycklar för lufttryck
+  // Nycklar för lufttryck
   CURRENT_PRESSURE: 'currentPressure',
   PRESSURE_TREND: 'pressureTrend'
 };
+
 // DOM-element
 const locationSelect = document.getElementById('location-select');
 const selectedLocationName = document.getElementById('selected-location-name');
@@ -41,6 +43,12 @@ const pressureTrend = document.getElementById('pressure-trend');
 const pressureTrendDescription = document.getElementById('pressure-trend-description');
 const pressureTrendIcon = document.getElementById('pressure-trend-icon');
 
+// DOM-element för UV-index
+const uvIndexBar = document.getElementById('uv-index-bar');
+const uvSunIcon = document.getElementById('uv-sun-icon');
+const uvValue = document.getElementById('uv-value');
+const uvRiskText = document.getElementById('uv-risk-text');
+
 // DOM-element för inställningar
 const settingsButton = document.getElementById('settings-button');
 const closeSettingsButton = document.getElementById('close-settings');
@@ -48,8 +56,10 @@ const settingsPanel = document.getElementById('settings-panel');
 const apiKeyInput = document.getElementById('api-key-input');
 const saveSettingsButton = document.getElementById('save-settings');
 const windScaleRadios = document.querySelectorAll('input[name="wind-scale"]');
+
 // Initialisera tillägget
 document.addEventListener('DOMContentLoaded', initializeExtension);
+
 /**
  * Initialiserar tillägget, fyller ortsväljaren och laddar väderdata
  */
@@ -125,6 +135,7 @@ function setupEventListeners() {
   // Ladda sparade inställningar
   loadSavedSettings();
 }
+
 /**
  * Laddar sparade inställningar från lagring
  */
@@ -168,6 +179,7 @@ function updateApiKeyStatus(apiKey) {
     apiKeyMessage.textContent = 'Soldata: Använder exakta soltider';
   }
 }
+
 /**
  * Öppnar inställningspanelen
  */
@@ -253,7 +265,7 @@ async function loadWeatherData() {
     const weatherData = await fetchWeatherData(lat, lon);
     
     // Behandla och visa väderdata
-    processWeatherData(weatherData);
+    await processWeatherData(weatherData);
     
     // Spara data och uppdatera tidsstämpel
     saveWeatherData(weatherData);
@@ -268,6 +280,16 @@ async function loadWeatherData() {
         hidePressureDisplay();
       });
     
+    // Hämta UV-index data
+    getUVData(locationName, parseFloat(lat), parseFloat(lon))
+      .then(uvData => {
+        updateUVDisplay(uvData);
+      })
+      .catch(error => {
+        console.error('Fel vid hämtning av UV-data:', error);
+        hideUVDisplay();
+      });
+    
     // Visa väderdisplayen
     showWeatherDisplay();
   } catch (error) {
@@ -275,6 +297,44 @@ async function loadWeatherData() {
     showErrorState();
   }
 }
+
+/**
+ * Uppdaterar UV-displayen baserat på hämtad data
+ * @param {Object} uvData - Objekt med UV-data
+ */
+function updateUVDisplay(uvData) {
+  if (!uvData || uvData.uvIndex === null || uvData.uvIndex === undefined) {
+    hideUVDisplay();
+    return;
+  }
+  
+  // Visa UV-baren
+  uvIndexBar.style.display = 'flex';
+  
+  // Uppdatera UV-värde
+  uvValue.textContent = uvData.uvIndex.toFixed(1);
+  
+  // Uppdatera risktextent
+  uvRiskText.textContent = uvData.riskText;
+  
+  // Ta bort gamla risk-klasser
+  uvIndexBar.classList.remove('uv-low', 'uv-moderate', 'uv-high', 'uv-very_high', 'uv-extreme');
+  
+  // Applicera ny färgklass
+  uvIndexBar.classList.add(`uv-${uvData.riskLevel}`);
+  
+  console.log(`☀️ UV-display uppdaterad: UV ${uvData.uvIndex} (${uvData.riskLevel})`);
+}
+
+/**
+ * Döljer UV-displayen om data inte är tillgänglig
+ */
+function hideUVDisplay() {
+  if (uvIndexBar) {
+    uvIndexBar.style.display = 'none';
+  }
+}
+
 /**
  * Hämtar väderdata från SMHI API
  * @param {string} lat - Latitud
@@ -658,6 +718,7 @@ function hidePressureDisplay() {
     container.style.display = 'none';
   }
 }
+
 /**
  * Uppdaterar väderikon baserat på väderförhållanden och tid på dygnet
  * @param {number} symbol - SMHI vädersymbolkod

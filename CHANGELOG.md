@@ -1,7 +1,28 @@
 Changelog - Svenskt väder
 
+## 1.1.0
+### Nya funktioner
+- **UV-index:** Tillägget visar nu UV-index från CurrentUVIndex.com API
+  - Färgkodad sol-ikon enligt Strålsäkerhetsmyndighetens skala (grön → gul → orange → röd → lila)
+  - Visar dagens maximala UV-värde med risknivå (Låg, Måttlig, Hög, Mycket hög, Extrem)
+  - Pulsande sol-ikon vid hög UV-risk (6+) för att uppmärksamma användaren
+  - 6-timmars cache för optimal prestanda
+  - Kräver ingen API-nyckel - fungerar direkt
+  - Informationssektion i inställningar med förklaring av UV-risknivåer
+
+### Förbättringar
+- UV-panel med neutral bakgrund och glaseffekt för bättre läsbarhet
+- Textstorlekar på UV-information anpassade för konsekvent design
+- Automatisk veckovis rensning av gammal UV-cache i bakgrunden
+- Lagt till host_permission för CurrentUVIndex.com API
+
+### Tekniska förbättringar
+- Ny modul: `uv-service.js` för UV-datahantering
+- Uppdaterad `background.js` med UV-cache underhåll
+- Utökad CSS med UV-styling integrerad i huvudfilen
+
 ## 1.0.5
- - Nya orter tillagda
+- Nya orter tillagda
 
 ## 1.0.4
 ### Förbättringar
