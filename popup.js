@@ -15,6 +15,7 @@ const STORAGE_KEYS = {
   WEATHER_DATA: 'weatherData',
   API_KEY: 'ipGeolocationApiKey',
   WIND_SCALE: 'windScale',
+  SHOW_UV_INDEX: 'showUVIndex',
   // Nycklar för lufttryck
   CURRENT_PRESSURE: 'currentPressure',
   PRESSURE_TREND: 'pressureTrend'
@@ -56,6 +57,7 @@ const settingsPanel = document.getElementById('settings-panel');
 const apiKeyInput = document.getElementById('api-key-input');
 const saveSettingsButton = document.getElementById('save-settings');
 const windScaleRadios = document.querySelectorAll('input[name="wind-scale"]');
+const showUVIndexCheckbox = document.getElementById('show-uv-index');
 
 // Initialisera tillägget
 document.addEventListener('DOMContentLoaded', initializeExtension);
@@ -140,7 +142,7 @@ function setupEventListeners() {
  * Laddar sparade inställningar från lagring
  */
 function loadSavedSettings() {
-  chrome.storage.local.get([STORAGE_KEYS.API_KEY, STORAGE_KEYS.WIND_SCALE], (result) => {
+  chrome.storage.local.get([STORAGE_KEYS.API_KEY, STORAGE_KEYS.WIND_SCALE, STORAGE_KEYS.SHOW_UV_INDEX], (result) => {
     // Ladda API-nyckel
     const savedApiKey = result[STORAGE_KEYS.API_KEY];
     if (savedApiKey) {
@@ -155,6 +157,10 @@ function loadSavedSettings() {
     // Ladda vindskala
     const savedWindScale = result[STORAGE_KEYS.WIND_SCALE] || 'beaufort';
     document.querySelector(`input[name="wind-scale"][value="${savedWindScale}"]`).checked = true;
+    
+    // Ladda UV-index visning (standard: true)
+    const showUV = result[STORAGE_KEYS.SHOW_UV_INDEX] !== undefined ? result[STORAGE_KEYS.SHOW_UV_INDEX] : true;
+    showUVIndexCheckbox.checked = showUV;
   });
 }
 
@@ -203,10 +209,14 @@ function saveSettings() {
   // Hämta vald vindskala
   const selectedWindScale = document.querySelector('input[name="wind-scale"]:checked').value;
   
+  // Hämta UV-visning inställning
+  const showUV = showUVIndexCheckbox.checked;
+  
   // Spara inställningar
   chrome.storage.local.set({ 
     [STORAGE_KEYS.API_KEY]: apiKey,
-    [STORAGE_KEYS.WIND_SCALE]: selectedWindScale
+    [STORAGE_KEYS.WIND_SCALE]: selectedWindScale,
+    [STORAGE_KEYS.SHOW_UV_INDEX]: showUV
   });
   
   // Uppdatera API-nyckelstatus
@@ -280,15 +290,23 @@ async function loadWeatherData() {
         hidePressureDisplay();
       });
     
-    // Hämta UV-index data
-    getUVData(locationName, parseFloat(lat), parseFloat(lon))
-      .then(uvData => {
-        updateUVDisplay(uvData);
-      })
-      .catch(error => {
-        console.error('Fel vid hämtning av UV-data:', error);
+    // Hämta UV-index data (om aktiverat)
+    chrome.storage.local.get([STORAGE_KEYS.SHOW_UV_INDEX], (result) => {
+      const showUV = result[STORAGE_KEYS.SHOW_UV_INDEX] !== undefined ? result[STORAGE_KEYS.SHOW_UV_INDEX] : true;
+      
+      if (showUV) {
+        getUVData(locationName, parseFloat(lat), parseFloat(lon))
+          .then(uvData => {
+            updateUVDisplay(uvData);
+          })
+          .catch(error => {
+            console.error('Fel vid hämtning av UV-data:', error);
+            hideUVDisplay();
+          });
+      } else {
         hideUVDisplay();
-      });
+      }
+    });
     
     // Visa väderdisplayen
     showWeatherDisplay();

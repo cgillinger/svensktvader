@@ -987,6 +987,27 @@ footer::before {
   accent-color: var(--primary-color);
 }
 
+/* ===== CHECKBOX STYLING ===== */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-shadow: var(--reflective-edge);
+  font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.checkbox-label span {
+  user-select: none;
+}
+
 /* ===== ATTRIBUTION BOX ===== */
 .attribution-section {
   margin-top: 15px;

@@ -1,5 +1,12 @@
 Changelog - Svenskt väder
 
+## 1.1.1
+### Förbättringar
+- UV-index är nu valbart via kryssruta i inställningar
+- Användare kan välja att visa eller dölja UV-index
+- UV-index visas som standard men kan stängas av om det inte önskas
+- Sparad inställning appliceras automatiskt vid omstart
+
 ## 1.1.0
 ### Nya funktioner
 - **UV-index:** Tillägget visar nu UV-index från CurrentUVIndex.com API
