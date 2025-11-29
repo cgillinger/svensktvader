@@ -16,6 +16,7 @@ const STORAGE_KEYS = {
   API_KEY: 'ipGeolocationApiKey',
   WIND_SCALE: 'windScale',
   SHOW_UV_INDEX: 'showUVIndex',
+  PRESSURE_UNIT: 'pressureUnit',
   // Nycklar för lufttryck
   CURRENT_PRESSURE: 'currentPressure',
   PRESSURE_TREND: 'pressureTrend'
@@ -57,6 +58,7 @@ const settingsPanel = document.getElementById('settings-panel');
 const apiKeyInput = document.getElementById('api-key-input');
 const saveSettingsButton = document.getElementById('save-settings');
 const windScaleRadios = document.querySelectorAll('input[name="wind-scale"]');
+const pressureUnitRadios = document.querySelectorAll('input[name="pressure-unit"]');
 const showUVIndexCheckbox = document.getElementById('show-uv-index');
 
 // Initialisera tillägget
@@ -142,7 +144,12 @@ function setupEventListeners() {
  * Laddar sparade inställningar från lagring
  */
 function loadSavedSettings() {
-  chrome.storage.local.get([STORAGE_KEYS.API_KEY, STORAGE_KEYS.WIND_SCALE, STORAGE_KEYS.SHOW_UV_INDEX], (result) => {
+  chrome.storage.local.get([
+    STORAGE_KEYS.API_KEY, 
+    STORAGE_KEYS.WIND_SCALE, 
+    STORAGE_KEYS.SHOW_UV_INDEX,
+    STORAGE_KEYS.PRESSURE_UNIT
+  ], (result) => {
     // Ladda API-nyckel
     const savedApiKey = result[STORAGE_KEYS.API_KEY];
     if (savedApiKey) {
@@ -157,6 +164,10 @@ function loadSavedSettings() {
     // Ladda vindskala
     const savedWindScale = result[STORAGE_KEYS.WIND_SCALE] || 'beaufort';
     document.querySelector(`input[name="wind-scale"][value="${savedWindScale}"]`).checked = true;
+    
+    // Ladda tryckenhet
+    const savedPressureUnit = result[STORAGE_KEYS.PRESSURE_UNIT] || 'hpa';
+    document.querySelector(`input[name="pressure-unit"][value="${savedPressureUnit}"]`).checked = true;
     
     // Ladda UV-index visning (standard: true)
     const showUV = result[STORAGE_KEYS.SHOW_UV_INDEX] !== undefined ? result[STORAGE_KEYS.SHOW_UV_INDEX] : true;
@@ -209,6 +220,9 @@ function saveSettings() {
   // Hämta vald vindskala
   const selectedWindScale = document.querySelector('input[name="wind-scale"]:checked').value;
   
+  // Hämta vald tryckenhet
+  const selectedPressureUnit = document.querySelector('input[name="pressure-unit"]:checked').value;
+  
   // Hämta UV-visning inställning
   const showUV = showUVIndexCheckbox.checked;
   
@@ -216,6 +230,7 @@ function saveSettings() {
   chrome.storage.local.set({ 
     [STORAGE_KEYS.API_KEY]: apiKey,
     [STORAGE_KEYS.WIND_SCALE]: selectedWindScale,
+    [STORAGE_KEYS.PRESSURE_UNIT]: selectedPressureUnit,
     [STORAGE_KEYS.SHOW_UV_INDEX]: showUV
   });
   
@@ -636,10 +651,28 @@ function formatDate(date) {
 }
 
 /**
+ * Konverterar lufttryck till vald enhet
+ * @param {number} hpa - Tryck i hPa
+ * @param {string} unit - Enhet (hpa, mbar, mmhg)
+ * @returns {Object} Objekt med värde och enhet
+ */
+function formatPressure(hpa, unit) {
+  switch(unit) {
+    case 'mbar':
+      return { value: hpa.toFixed(1), unit: 'mbar' };
+    case 'mmhg':
+      return { value: (hpa * 0.750062).toFixed(1), unit: 'mmHg' };
+    case 'hpa':
+    default:
+      return { value: hpa.toFixed(1), unit: 'hPa' };
+  }
+}
+
+/**
  * Uppdaterar lufttrycksdisplayen baserat på hämtad data
  * @param {Object} pressureData - Objekt med lufttrycksdata
  */
-function updatePressureDisplay(pressureData) {
+async function updatePressureDisplay(pressureData) {
   const container = document.querySelector('.pressure-detail');
   
   if (!pressureData || pressureData.currentPressure === null) {
@@ -655,9 +688,18 @@ function updatePressureDisplay(pressureData) {
     container.style.display = 'flex';
   }
   
+  // Hämta vald tryckenhet
+  const result = await new Promise((resolve) => {
+    chrome.storage.local.get([STORAGE_KEYS.PRESSURE_UNIT], resolve);
+  });
+  const pressureUnit = result[STORAGE_KEYS.PRESSURE_UNIT] || 'hpa';
+  
+  // Formatera tryckvärdet
+  const formatted = formatPressure(pressureData.currentPressure, pressureUnit);
+  
   // Uppdatera värden
   if (pressureValue) {
-    pressureValue.textContent = `${pressureData.currentPressure.toFixed(1)} hPa`;
+    pressureValue.textContent = `${formatted.value} ${formatted.unit}`;
   }
   
   // Uppdatera med trend och beskrivning på separata rader

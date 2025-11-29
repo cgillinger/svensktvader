@@ -6,6 +6,8 @@ Changelog - Svenskt väder
 - Användare kan välja att visa eller dölja UV-index
 - UV-index visas som standard men kan stängas av om det inte önskas
 - Sparad inställning appliceras automatiskt vid omstart
+- Lufttryck kan nu visas i tre olika enheter: hPa, mbar eller mmHg
+- Vald tryckenhet sparas och tillämpas automatiskt
 
 ## 1.1.0
 ### Nya funktioner
