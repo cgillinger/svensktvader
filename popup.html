@@ -50,7 +50,7 @@
           </div>
         </div>
 
-        <!-- NY: UV-index panel direkt under temperaturen -->
+        <!-- UV-index panel direkt under temperaturen -->
         <div class="uv-index-bar" id="uv-index-bar" style="display: none;">
           <div class="uv-icon-wrapper">
             <i class="fas fa-sun uv-sun-icon" id="uv-sun-icon"></i>
@@ -64,9 +64,50 @@
           </div>
         </div>
 
+        <!-- NYTT: NEDERBÖRDSBAR (visas endast vid nederbörd) -->
+        <div class="precipitation-bar" id="precipitation-bar" style="display: none;">
+          <div class="precipitation-header">
+            <i class="wi wi-raindrops precipitation-icon"></i>
+            <span class="precipitation-title">NEDERBÖRD KOMMANDE 2 TIMMAR</span>
+          </div>
+          
+          <div class="precipitation-info">
+            <div class="precipitation-text">
+              <span class="precip-label">Nästa timme:</span>
+              <span class="precip-value" id="precip-next-hour">--</span>
+              <span class="precip-separator">•</span>
+              <span class="precip-label">Peak:</span>
+              <span class="precip-value" id="precip-peak">--</span>
+            </div>
+          </div>
+          
+          <div class="precipitation-timeline">
+            <div class="timeline-item">
+              <div class="timeline-dots" id="timeline-dots-0">●</div>
+              <div class="timeline-time" id="timeline-time-0">Nu</div>
+              <div class="timeline-value" id="timeline-value-0">--</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dots" id="timeline-dots-1">●</div>
+              <div class="timeline-time" id="timeline-time-1">+1h</div>
+              <div class="timeline-value" id="timeline-value-1">--</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dots" id="timeline-dots-2">●</div>
+              <div class="timeline-time" id="timeline-time-2">+2h</div>
+              <div class="timeline-value" id="timeline-value-2">--</div>
+            </div>
+          </div>
+          
+          <div class="precipitation-description" id="precipitation-description">
+            Lätt regn
+          </div>
+        </div>
+        <!-- SLUT: NEDERBÖRDSBAR -->
+
         <!-- Omdesignade väderdetaljer med tydliga etiketter -->
-        <div class="weather-details">
-          <div class="detail">
+        <div class="weather-details" id="weather-details">
+          <div class="detail" data-card="wind">
             <div class="detail-icon">
               <!-- Vindikon som kan ändras baserat på vindskala -->
               <i id="wind-speed-icon" class="wi wi-strong-wind"></i>
@@ -77,7 +118,7 @@
             </div>
           </div>
           
-          <div class="detail">
+          <div class="detail" data-card="direction">
             <div class="detail-icon">
               <!-- Använd 'from-' istället för 'towards-' för korrekt vindriktningsvisning -->
               <i class="wi wi-wind from-0-deg direction-icon"></i>
@@ -89,7 +130,7 @@
           </div>
           
           <!-- Lufttryckspanel med uppdaterad layout -->
-          <div class="detail pressure-detail two-column-detail">
+          <div class="detail pressure-detail two-column-detail" data-card="pressure">
             <div class="pressure-left">
               <div class="detail-icon">
                 <i class="wi wi-barometer"></i>
@@ -114,7 +155,7 @@
           </div>
           
           <!-- Soluppgång och solnedgång tillsammans men med separata gula ikoner -->
-          <div class="detail sun-times">
+          <div class="detail sun-times" data-card="sun">
             <div class="sunrise-container">
               <div class="sun-label">Soluppgång</div>
               <i class="wi wi-sunrise sun-icon"></i>
@@ -175,6 +216,76 @@
           </div>
         </div>
         
+        <!-- Anpassa kortlayout (flyttad hit) -->
+        <div class="setting-item">
+          <label>📐 Anpassa kortlayout</label>
+          
+          <div class="layout-settings">
+            <div class="layout-option">
+              <label>Position 1:</label>
+              <select id="card-position-1">
+                <option value="precipitation">Nederbörd</option>
+                <option value="uv">UV-index</option>
+                <option value="wind">Vind + Vindriktning</option>
+                <option value="pressure">Lufttryck + Trycktrend</option>
+                <option value="sun">Soluppgång/nedgång</option>
+              </select>
+            </div>
+            
+            <div class="layout-option">
+              <label>Position 2:</label>
+              <select id="card-position-2">
+                <option value="uv">UV-index</option>
+                <option value="precipitation">Nederbörd</option>
+                <option value="wind">Vind + Vindriktning</option>
+                <option value="pressure">Lufttryck + Trycktrend</option>
+                <option value="sun">Soluppgång/nedgång</option>
+              </select>
+            </div>
+            
+            <div class="layout-option">
+              <label>Position 3:</label>
+              <select id="card-position-3">
+                <option value="wind">Vind + Vindriktning</option>
+                <option value="precipitation">Nederbörd</option>
+                <option value="uv">UV-index</option>
+                <option value="pressure">Lufttryck + Trycktrend</option>
+                <option value="sun">Soluppgång/nedgång</option>
+              </select>
+            </div>
+            
+            <div class="layout-option">
+              <label>Position 4:</label>
+              <select id="card-position-4">
+                <option value="pressure">Lufttryck + Trycktrend</option>
+                <option value="precipitation">Nederbörd</option>
+                <option value="uv">UV-index</option>
+                <option value="wind">Vind + Vindriktning</option>
+                <option value="sun">Soluppgång/nedgång</option>
+              </select>
+            </div>
+            
+            <div class="layout-option">
+              <label>Position 5:</label>
+              <select id="card-position-5">
+                <option value="sun">Soluppgång/nedgång</option>
+                <option value="precipitation">Nederbörd</option>
+                <option value="uv">UV-index</option>
+                <option value="wind">Vind + Vindriktning</option>
+                <option value="pressure">Lufttryck + Trycktrend</option>
+              </select>
+            </div>
+            
+            <button id="reset-layout" class="secondary-button">
+              <i class="fas fa-undo"></i> Återställ till standard
+            </button>
+          </div>
+          
+          <p class="setting-description">
+            Välj ordning på väderkorten.
+          </p>
+        </div>
+        
         <div class="setting-item">
           <label>Visa vindhastighet som:</label>
           <div class="radio-group">
@@ -212,13 +323,18 @@
           </div>
         </div>
         
-        <!-- NY: UV-index visning toggle -->
+        <!-- UV-index visning toggle -->
         <div class="setting-item">
           <label class="checkbox-label">
             <input type="checkbox" id="show-uv-index" checked>
             <span>Visa UV-index</span>
           </label>
           <p class="setting-description">Visar dagens maximala UV-index från CurrentUVIndex.com. Kräver ingen API-nyckel.</p>
+        </div>
+        
+        <!-- Spara-knapp -->
+        <div class="setting-actions">
+          <button id="save-settings" class="primary-button">Spara</button>
         </div>
         
         <!-- UV-index information -->
@@ -245,9 +361,47 @@
           </div>
         </div>
         
-        <!-- Spara-knapp flyttad över attribution -->
-        <div class="setting-actions">
-          <button id="save-settings" class="primary-button">Spara</button>
+        <!-- Nederbörd information -->
+        <div class="setting-item precipitation-info-section">
+          <h3><i class="wi wi-raindrops"></i> Nederbörd Information</h3>
+          <div class="info-box">
+            <p><strong>Nederbördsbaren visar prognos för kommande 2 timmar.</strong></p>
+            <p>Data hämtas automatiskt från SMHI:s prognosAPI när nederbörd förväntas.</p>
+            
+            <div class="precipitation-visibility-guide">
+              <p><strong>När visas nederbördsbaren?</strong></p>
+              <ul class="precipitation-rules-list">
+                <li><i class="fas fa-check-circle" style="color: #4caf50;"></i> <strong>Visas:</strong> När nederbörd ≥ 0.1 mm/h förväntas inom 2 timmar</li>
+                <li><i class="fas fa-times-circle" style="color: #f44336;"></i> <strong>Döljs:</strong> Vid uppehåll eller lätt duggregn (&lt;0.1 mm/h)</li>
+              </ul>
+            </div>
+            
+            <div class="precipitation-scale-guide">
+              <p><strong>Färgkodning enligt svensk standard:</strong></p>
+              <ul class="precipitation-levels-list">
+                <li><span class="precip-dot precip-drizzle"></span> <strong>&lt;0.1 mm/h:</strong> Duggregn (döljs)</li>
+                <li><span class="precip-dot precip-light"></span> <strong>0.1-1 mm/h:</strong> Lätt regn</li>
+                <li><span class="precip-dot precip-moderate"></span> <strong>1-5 mm/h:</strong> Måttligt regn</li>
+                <li><span class="precip-dot precip-heavy"></span> <strong>5-10 mm/h:</strong> Kraftigt regn</li>
+                <li><span class="precip-dot precip-extreme"></span> <strong>&gt;10 mm/h:</strong> Skyfall</li>
+              </ul>
+            </div>
+            
+            <div class="precipitation-features-guide">
+              <p><strong>Vad visas i baren?</strong></p>
+              <ul class="precipitation-features-list">
+                <li><strong>Nästa timme:</strong> Förväntad nederbörd kommande 60 minuter</li>
+                <li><strong>Peak:</strong> Högsta värdet inom 2 timmar</li>
+                <li><strong>Tidslinje:</strong> Visuell graf med färgkodade prickar (●) för Nu, +1h, +2h</li>
+                <li><strong>Typ:</strong> Automatisk identifiering (regn/snö/snöblandat baserat på temperatur)</li>
+                <li><strong>Trend:</strong> Visar om nederbörden intensifieras eller avtar</li>
+              </ul>
+            </div>
+            
+            <p class="precipitation-note"><em>OBS: Nederbörd uppdateras var 30:e minut tillsammans med övrig väderdata. Prickarnas antal (1-4) visar intensitet.</em></p>
+            
+            <p class="precipitation-attribution">Data: <a href="https://opendata.smhi.se/" target="_blank">SMHI Öppna Data</a> (CC0 1.0)</p>
+          </div>
         </div>
         
         <!-- Attribution sektion -->

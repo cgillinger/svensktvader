@@ -17,6 +17,7 @@ const STORAGE_KEYS = {
   WIND_SCALE: 'windScale',
   SHOW_UV_INDEX: 'showUVIndex',
   PRESSURE_UNIT: 'pressureUnit',
+  CARD_LAYOUT: 'cardLayout',
   // Nycklar för lufttryck
   CURRENT_PRESSURE: 'currentPressure',
   PRESSURE_TREND: 'pressureTrend'
@@ -138,6 +139,9 @@ function setupEventListeners() {
   
   // Ladda sparade inställningar
   loadSavedSettings();
+  
+  // Initialisera kortlayout
+  initializeCardLayout();
 }
 
 /**
@@ -439,6 +443,9 @@ async function processWeatherData(data) {
   
   // Uppdatera dagsprognos
   updateDailyForecast(data.timeSeries);
+  
+  // NYTT: Uppdatera nederbördsbar
+  updatePrecipitationBar(data.timeSeries, temperature);
   
   // Uppdatera tidsstämpel
   const now = new Date();
@@ -1278,4 +1285,230 @@ function saveWeatherData(data) {
     [STORAGE_KEYS.WEATHER_DATA]: data,
     [STORAGE_KEYS.LAST_UPDATED]: timestamp
   });
+}
+
+/**
+ * Uppdaterar nederbördsbaren baserat på kommande 2 timmar
+ * @param {Array} timeSeries - Väderdata tidsserie
+ * @param {number} currentTemp - Aktuell temperatur för att identifiera typ
+ */
+function updatePrecipitationBar(timeSeries, currentTemp) {
+  const precipBar = document.getElementById('precipitation-bar');
+  
+  if (!precipBar || !timeSeries || timeSeries.length < 3) {
+    if (precipBar) precipBar.style.display = 'none';
+    return;
+  }
+  
+  // Extrahera nederbörd för kommande 3 timmar (0, 1, 2)
+  const precipValues = [];
+  for (let i = 0; i < 3 && i < timeSeries.length; i++) {
+    const pmedian = getParameterValue(timeSeries[i], 'pmedian');
+    precipValues.push(pmedian !== null ? pmedian : 0);
+  }
+  
+  // Beräkna peak-värde
+  const peak = Math.max(...precipValues);
+  
+  // Visa bara om nederbörd förväntas (>0.1 mm/h)
+  if (peak < 0.1) {
+    precipBar.style.display = 'none';
+    return;
+  }
+  
+  // Visa baren
+  precipBar.style.display = 'block';
+  
+  // Uppdatera värden
+  document.getElementById('precip-next-hour').textContent = `${precipValues[0].toFixed(1)} mm/h`;
+  document.getElementById('precip-peak').textContent = `${peak.toFixed(1)} mm/h`;
+  
+  // Uppdatera tidslinje
+  const now = new Date();
+  for (let i = 0; i < 3; i++) {
+    const value = precipValues[i];
+    const color = getPrecipitationColor(value);
+    
+    // Beräkna antal prickar (1-4 baserat på intensitet)
+    const dotCount = Math.min(4, Math.max(1, Math.ceil(value / 2)));
+    const dots = '●'.repeat(dotCount);
+    
+    // Uppdatera DOM
+    const dotsElem = document.getElementById(`timeline-dots-${i}`);
+    const timeElem = document.getElementById(`timeline-time-${i}`);
+    const valueElem = document.getElementById(`timeline-value-${i}`);
+    
+    if (dotsElem) {
+      dotsElem.textContent = dots;
+      dotsElem.style.color = color;
+    }
+    
+    if (timeElem) {
+      if (i === 0) {
+        timeElem.textContent = 'Nu';
+      } else {
+        const futureTime = new Date(now.getTime() + i * 60 * 60 * 1000);
+        timeElem.textContent = formatTime(futureTime);
+      }
+    }
+    
+    if (valueElem) {
+      valueElem.textContent = `${value.toFixed(1)} mm`;
+    }
+  }
+  
+  // Generera beskrivning
+  const description = getPrecipitationDescription({
+    values: precipValues,
+    peak: peak
+  }, currentTemp);
+  
+  const descElem = document.getElementById('precipitation-description');
+  if (descElem) {
+    descElem.textContent = description;
+  }
+  
+  console.log(`🌧️ Nederbörd: Peak ${peak.toFixed(1)} mm/h`);
+}
+
+/**
+ * Returnerar färg baserat på nederbördsintensitet (svensk standard)
+ * @param {number} mmPerHour - Nederbörd i mm/h
+ * @returns {string} Hex-färgkod
+ */
+function getPrecipitationColor(mmPerHour) {
+  if (mmPerHour < 0.1) return '#90caf9';      // Duggregn - Ljusblå
+  if (mmPerHour < 1) return '#4caf50';        // Lätt regn - Grön
+  if (mmPerHour < 5) return '#ffeb3b';        // Måttligt regn - Gul
+  if (mmPerHour < 10) return '#ff9800';       // Kraftigt regn - Orange
+  return '#f44336';                            // Skyfall - Röd
+}
+
+/**
+ * Genererar beskrivande text för nederbörd
+ * @param {Object} precipData - Objekt med values och peak
+ * @param {number} currentTemp - Temperatur för att identifiera typ
+ * @returns {string} Beskrivande text
+ */
+function getPrecipitationDescription(precipData, currentTemp) {
+  const { values, peak } = precipData;
+  
+  // Identifiera typ baserat på temperatur
+  let type = 'regn';
+  if (currentTemp < 0) {
+    type = 'snö';
+  } else if (currentTemp <= 2) {
+    type = 'snöblandat regn';
+  }
+  
+  // Identifiera intensitet
+  let intensity = '';
+  if (peak < 0.5) {
+    intensity = 'Mycket lätt';
+  } else if (peak < 1) {
+    intensity = 'Lätt';
+  } else if (peak < 5) {
+    intensity = 'Måttligt';
+  } else if (peak < 10) {
+    intensity = 'Kraftigt';
+  } else {
+    intensity = 'Mycket kraftigt';
+  }
+  
+  // Identifiera trend
+  let trend = '';
+  if (values.length >= 2) {
+    const firstHalf = values[0];
+    const secondHalf = values[values.length - 1];
+    
+    if (secondHalf > firstHalf * 1.5) {
+      trend = ' → intensifieras';
+    } else if (secondHalf < firstHalf * 0.7) {
+      trend = ' → avtar';
+    }
+  }
+  
+  return `${intensity} ${type}${trend}`;
+}
+
+// ===== KORTLAYOUT FUNKTIONER =====
+
+/**
+ * Default kortlayout (5 block)
+ */
+const DEFAULT_CARD_LAYOUT = {
+  pos1: 'precipitation',
+  pos2: 'uv',
+  pos3: 'wind',
+  pos4: 'pressure',
+  pos5: 'sun'
+};
+
+/**
+ * Sparar kortlayout till storage (gör ingenting ännu - bara UI)
+ */
+function saveCardLayout() {
+  const layout = {
+    pos1: document.getElementById('card-position-1')?.value || 'uv',
+    pos2: document.getElementById('card-position-2')?.value || 'wind',
+    pos3: document.getElementById('card-position-3')?.value || 'pressure',
+    pos4: document.getElementById('card-position-4')?.value || 'sun',
+    pos5: document.getElementById('card-position-5')?.value || 'precipitation'
+  };
+  
+  chrome.storage.local.set({ cardLayout: layout }, () => {
+    console.log('💾 Kortlayout sparad:', layout);
+  });
+}
+
+/**
+ * Laddar kortlayout från storage
+ */
+function loadCardLayout() {
+  chrome.storage.local.get(['cardLayout'], (result) => {
+    const layout = result.cardLayout || DEFAULT_CARD_LAYOUT;
+    
+    const pos1 = document.getElementById('card-position-1');
+    const pos2 = document.getElementById('card-position-2');
+    const pos3 = document.getElementById('card-position-3');
+    const pos4 = document.getElementById('card-position-4');
+    const pos5 = document.getElementById('card-position-5');
+    
+    if (pos1) pos1.value = layout.pos1;
+    if (pos2) pos2.value = layout.pos2;
+    if (pos3) pos3.value = layout.pos3;
+    if (pos4) pos4.value = layout.pos4;
+    if (pos5) pos5.value = layout.pos5;
+  });
+}
+
+/**
+ * Återställer kortlayout till standard
+ */
+function resetCardLayout() {
+  chrome.storage.local.set({ cardLayout: DEFAULT_CARD_LAYOUT }, () => {
+    console.log('🔄 Kortlayout återställd');
+    loadCardLayout();
+  });
+}
+
+/**
+ * Initierar kortlayout event listeners
+ */
+function initializeCardLayout() {
+  const pos1 = document.getElementById('card-position-1');
+  const pos2 = document.getElementById('card-position-2');
+  const pos3 = document.getElementById('card-position-3');
+  const pos4 = document.getElementById('card-position-4');
+  const pos5 = document.getElementById('card-position-5');
+  const resetBtn = document.getElementById('reset-layout');
+  
+  if (pos1) pos1.addEventListener('change', saveCardLayout);
+  if (pos2) pos2.addEventListener('change', saveCardLayout);
+  if (pos3) pos3.addEventListener('change', saveCardLayout);
+  if (pos4) pos4.addEventListener('change', saveCardLayout);
+  if (pos5) pos5.addEventListener('change', saveCardLayout);
+  if (resetBtn) resetBtn.addEventListener('click', resetCardLayout);
+  
+  loadCardLayout();
 }
