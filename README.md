@@ -76,7 +76,7 @@ Tillägget visar nederbörd för kommande 2 timmar när regn, snö eller snöbla
 
 ## API-källor
 
-- **SMHI Prognos API:** Väderdata och prognoser (inkl. nederbörd)
+- **SMHI Prognos API (SNOW1gv1):** Väderdata och prognoser (inkl. nederbörd) – `snow1g/version/1`
 - **SMHI Observations API:** Lufttrycksdata från närmaste mätstation
 - **CurrentUVIndex.com API:** UV-index (gratis, ingen nyckel krävs, 500 anrop/dag)
 - **IP Geolocation API:** Exakta soltider (valfritt, kräver gratis API-nyckel)
@@ -135,6 +135,14 @@ svensktvader/
 ---
 
 ## Changelog
+
+### Version 1.3.0
+**API-migrering:**
+- Bytt från avvecklade SMHI PMP3gv2 till nya SNOW1gv1 (avvecklat 31 mars 2026)
+- Ny API-URL: `snow1g/version/1` ersätter `pmp3g/version/2`
+- Ny svarsstruktur: `data`-dict istället för `parameters`-array
+- Intern mappningsfunktion för bakåtkompatibel parsning
+- Tidpunktsnyckel uppdaterad: `validTime` → `time`
 
 ### Version 1.2.0
 **Ny funktion:**
