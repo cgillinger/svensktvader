@@ -1,4 +1,23 @@
-# CHANGELOG - Version 1.2.0
+# CHANGELOG - Version 1.3.0
+
+## Version 1.3.0 – SMHI API-migrering (2026-03-31)
+
+### Ändringar
+- **API-migrering:** Bytt från avvecklade PMP3gv2 till nya SNOW1gv1
+  - Ny API-URL: `snow1g/version/1` ersätter `pmp3g/version/2`
+  - Ny svarsstruktur: `data`-dict istället för `parameters`-array
+  - Nya parameternamn (t → air_temperature, ws → wind_speed, etc.)
+  - Tidpunktsnyckel ändrad från `validTime` till `time`
+- **Buggfix:** Intern mappningsfunktion säkerställer bakåtkompatibel parsning
+- Version bumpas till 1.3.0
+
+### Uppdaterade filer
+- `manifest.json` — version 1.3.0
+- `popup.js` — ny API-URL, ny parsningslogik, validTime → time
+- `background.js` — ny API-URL
+- `CHANGELOG.md` — denna post
+
+---
 
 ## 🌧️ Nederbörd och prognos - Release 1.2.0 (2025-11-29)
 

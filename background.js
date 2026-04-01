@@ -146,7 +146,7 @@ function cleanOldSunCache() {
 
 // Funktion för att hämta väderdata från SMHI API
 async function fetchWeatherData(lat, lon) {
-  const url = `https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/${lon}/lat/${lat}/data.json`;
+  const url = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${lon}/lat/${lat}/data.json`;
   
   const response = await fetch(url);
   

@@ -6,7 +6,7 @@ import { getPressureData } from './pressure-service.js';
 import { getUVData } from './uv-service.js';
 
 // Konstanter
-const SMHI_API_BASE = 'https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point';
+const SMHI_API_BASE = 'https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point';
 const UPDATE_INTERVAL = 30 * 60 * 1000; // 30 minuter
 const STORAGE_KEYS = {
   SELECTED_LOCATION: 'selectedLocation',
@@ -487,7 +487,7 @@ function updateDailyForecast(timeSeries) {
     // Hitta middag/dag-väderförhållandet (12-15)
     let dayWeatherSymbol = null;
     for (const data of dayData) {
-      const time = new Date(data.validTime);
+      const time = new Date(data.time);
       const hour = time.getHours();
       
       // Använd väderikon för mitt på dagen om möjligt (typiskt väder för dagen)
@@ -522,7 +522,7 @@ function updateDailyForecast(timeSeries) {
     }
     
     // Skapa ett datum för visning
-    const date = new Date(dayData[0].validTime);
+    const date = new Date(dayData[0].time);
     
     // Skapa prognosobjekt för dagen
     createDailyForecastItem(date, dayWeatherSymbol, minTemp, maxTemp);
@@ -538,7 +538,7 @@ function groupByDay(timeSeries) {
   const days = {};
   
   timeSeries.forEach(data => {
-    const date = new Date(data.validTime);
+    const date = new Date(data.time);
     const day = date.toISOString().split('T')[0]; // YYYY-MM-DD format
     
     if (!days[day]) {
@@ -845,14 +845,35 @@ function updateWindDirection(degrees) {
 }
 
 /**
- * Hämtar en parametervärde från SMHI API-data
- * @param {Object} weatherData - Väderdata-objekt
- * @param {string} name - Parameternamn
- * @returns {number} Parametervärde
+ * Mappning från gamla PMP3gv2-parameternamn till nya SNOW1gv1-nycklar
+ */
+const PARAM_NAME_MAP = {
+  't': 'air_temperature',
+  'Wsymb2': 'symbol_code',
+  'ws': 'wind_speed',
+  'wd': 'wind_from_direction',
+  'tp': 'precipitation_amount_mean',
+  'pmedian': 'precipitation_amount_median',
+  'pmin': 'precipitation_amount_min',
+  'pmax': 'precipitation_amount_max',
+  'msl': 'air_pressure_at_mean_sea_level',
+  'r': 'relative_humidity',
+  'gust': 'wind_speed_of_gust',
+  'vis': 'visibility_in_air',
+  'tcc_mean': 'cloud_area_fraction'
+};
+
+/**
+ * Hämtar ett parametervärde från SMHI API-data (SNOW1gv1-format)
+ * @param {Object} weatherData - Väderdata-objekt med 'data'-dict
+ * @param {string} name - Gammalt parameternamn (t, ws, Wsymb2 etc.)
+ * @returns {number|null} Parametervärde
  */
 function getParameterValue(weatherData, name) {
-  const parameter = weatherData.parameters.find(p => p.name === name);
-  return parameter ? parameter.values[0] : null;
+  const newKey = PARAM_NAME_MAP[name];
+  if (!newKey || !weatherData.data) return null;
+  const value = weatherData.data[newKey];
+  return value !== undefined ? value : null;
 }
 
 /**
@@ -866,7 +887,7 @@ function updateForecast(timeSeries) {
   // Loopa genom tidsserien (var tredje timme) för prognosen
   for (let i = 1; i < Math.min(13, timeSeries.length); i += 3) {
     const forecastData = timeSeries[i];
-    const forecastTime = new Date(forecastData.validTime);
+    const forecastTime = new Date(forecastData.time);
     const temp = getParameterValue(forecastData, 't');
     const symbol = getParameterValue(forecastData, 'Wsymb2');
     const precipitation = getParameterValue(forecastData, 'pmedian');
