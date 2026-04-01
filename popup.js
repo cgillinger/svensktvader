@@ -853,7 +853,7 @@ const PARAM_NAME_MAP = {
   'ws': 'wind_speed',
   'wd': 'wind_from_direction',
   'tp': 'precipitation_amount_mean',
-  'pmedian': 'precipitation_amount_mean',
+  'pmedian': 'precipitation_amount_median',
   'pmin': 'precipitation_amount_min',
   'pmax': 'precipitation_amount_max',
   'msl': 'air_pressure_at_mean_sea_level',
