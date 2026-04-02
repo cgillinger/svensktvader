@@ -331,7 +331,35 @@
           </label>
           <p class="setting-description">Visar dagens maximala UV-index från CurrentUVIndex.com. Kräver ingen API-nyckel.</p>
         </div>
-        
+
+        <!-- Toolbar-display val -->
+        <div class="setting-item">
+          <label>Visa i verktygsfältet:</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="toolbar-display" value="none">
+              Ingen (standard-ikon)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="toolbar-display" value="temp" checked>
+              🌡️ Aktuell temperatur
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="toolbar-display" value="uv">
+              ☀️ UV-index
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="toolbar-display" value="wind">
+              💨 Vindstyrka (Beaufort)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="toolbar-display" value="pressure">
+              📊 Lufttryckstrend (pil)
+            </label>
+          </div>
+          <p class="setting-description">Visar valt värde som miniikon direkt i webbläsarens verktygsfält.</p>
+        </div>
+
         <!-- Spara-knapp -->
         <div class="setting-actions">
           <button id="save-settings" class="primary-button">Spara</button>
