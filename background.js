@@ -251,8 +251,10 @@ function generateToolbarIcon(text, color, sizes = [16, 32, 48]) {
       fontSize = size * 0.75;
     } else if (text.length === 2) {
       fontSize = size * 0.65;
-    } else {
+    } else if (text.length === 3) {
       fontSize = size * 0.5;
+    } else {
+      fontSize = size * 0.4;  // 4+ tecken, t.ex. "-10°"
     }
 
     ctx.font = `bold ${fontSize}px sans-serif`;
@@ -277,6 +279,17 @@ function generateToolbarIcon(text, color, sizes = [16, 32, 48]) {
   return imageDataMap;
 }
 
+// Återställ toolbar-ikonen till default
+function restoreDefaultIcon() {
+  chrome.action.setIcon({
+    path: {
+      16: 'icons/icon16.png',
+      48: 'icons/icon48.png',
+      128: 'icons/icon128.png'
+    }
+  });
+}
+
 // Uppdatera toolbar-ikonen baserat på TOOLBAR_DISPLAY-inställningen
 async function updateToolbarIcon() {
   const storageResult = await chrome.storage.local.get([
@@ -286,16 +299,10 @@ async function updateToolbarIcon() {
     STORAGE_KEYS.PRESSURE_TREND
   ]);
 
-  const displayMode = storageResult[STORAGE_KEYS.TOOLBAR_DISPLAY] || 'none';
+  const displayMode = storageResult[STORAGE_KEYS.TOOLBAR_DISPLAY] || 'temp';
 
   if (displayMode === 'none') {
-    chrome.action.setIcon({
-      path: {
-        16: 'icons/icon16.png',
-        48: 'icons/icon48.png',
-        128: 'icons/icon128.png'
-      }
-    });
+    restoreDefaultIcon();
     return;
   }
 
@@ -304,28 +311,31 @@ async function updateToolbarIcon() {
 
   if (displayMode === 'temp' || displayMode === 'wind') {
     const weatherData = storageResult[STORAGE_KEYS.WEATHER_DATA];
-    if (!weatherData || !weatherData.timeSeries || weatherData.timeSeries.length === 0) return;
+    if (!weatherData || !weatherData.timeSeries || weatherData.timeSeries.length === 0) {
+      restoreDefaultIcon();
+      return;
+    }
     const currentWeather = weatherData.timeSeries[0];
 
     if (displayMode === 'temp') {
       const temp = getParameterValue(currentWeather, 't');
-      if (temp === null) return;
+      if (temp === null) { restoreDefaultIcon(); return; }
       text = Math.round(temp) + '°';
       color = getTempColor(temp);
     } else {
       const ws = getParameterValue(currentWeather, 'ws');
-      if (ws === null) return;
+      if (ws === null) { restoreDefaultIcon(); return; }
       const beaufort = getBeaufortForce(ws);
       text = beaufort.toString();
       color = getWindColor(beaufort);
     }
   } else if (displayMode === 'uv') {
     const locationName = storageResult[STORAGE_KEYS.SELECTED_LOCATION_NAME];
-    if (!locationName) return;
+    if (!locationName) { restoreDefaultIcon(); return; }
     const uvCacheKey = `uv_cache_${locationName}`;
     const uvResult = await chrome.storage.local.get(uvCacheKey);
     const uvData = uvResult[uvCacheKey];
-    if (!uvData || uvData.uvIndex === undefined) return;
+    if (!uvData || uvData.uvIndex === undefined) { restoreDefaultIcon(); return; }
     text = Math.round(uvData.uvIndex).toString();
     color = getUVColor(uvData.uvIndex);
   } else if (displayMode === 'pressure') {
@@ -340,7 +350,7 @@ async function updateToolbarIcon() {
     color = '#FFFFFF';
   }
 
-  if (text === null) return;
+  if (text === null) { restoreDefaultIcon(); return; }
 
   // Specialhantering för chevron-storlek
   const isChevron = displayMode === 'pressure';
@@ -353,7 +363,8 @@ async function updateToolbarIcon() {
     const fontSize = isChevron ? size * 0.7 : (
       text.length === 1 ? size * 0.75 :
       text.length === 2 ? size * 0.65 :
-      size * 0.5
+      text.length === 3 ? size * 0.5 :
+      size * 0.4  // 4+ tecken, t.ex. "-10°"
     );
 
     ctx.font = `bold ${fontSize}px sans-serif`;

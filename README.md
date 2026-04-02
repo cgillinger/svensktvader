@@ -136,6 +136,17 @@ svensktvader/
 
 ## Changelog
 
+### Version 1.3.1
+**Ny funktion:**
+- Toolbar badge-display: Visa aktuellt väderdata direkt i webbläsarens verktygsfält
+- Valbara alternativ: Temperatur (default), UV-index, Vindstyrka (Beaufort), Lufttryckstrend (pil)
+- Dynamisk färgkodning per datatyp
+- Uppdateras automatiskt vid varje väderuppdatering (var 30:e minut)
+
+**Tekniskt:**
+- Använder OffscreenCanvas för dynamisk ikonrendering i MV3 service worker
+- Stöd för 16px, 32px och 48px ikonstorlekar
+
 ### Version 1.3.0
 **API-migrering:**
 - Bytt från avvecklade SMHI PMP3gv2 till nya SNOW1gv1 (avvecklat 31 mars 2026)

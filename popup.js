@@ -181,7 +181,7 @@ function loadSavedSettings() {
     showUVIndexCheckbox.checked = showUV;
 
     // Ladda toolbar-display inställning (standard: 'none')
-    const savedToolbarDisplay = result[STORAGE_KEYS.TOOLBAR_DISPLAY] || 'none';
+    const savedToolbarDisplay = result[STORAGE_KEYS.TOOLBAR_DISPLAY] || 'temp';
     const toolbarRadio = document.querySelector(`input[name="toolbar-display"][value="${savedToolbarDisplay}"]`);
     if (toolbarRadio) toolbarRadio.checked = true;
   });

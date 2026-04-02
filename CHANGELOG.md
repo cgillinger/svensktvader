@@ -1,4 +1,27 @@
-# CHANGELOG - Version 1.3.0
+# CHANGELOG - Version 1.3.1
+
+## Version 1.3.1 – Toolbar badge-display (2026-04-02)
+
+### Ny funktion
+- **Toolbar badge-display:** Visa aktuellt väderdata direkt i webbläsarens verktygsfält
+- Valbara alternativ: Temperatur (default), UV-index, Vindstyrka (Beaufort), Lufttryckstrend (pil)
+- Dynamisk färgkodning per datatyp (temperatur, UV SSM-skala, Beaufort, trendpil)
+- Uppdateras automatiskt vid varje väderuppdatering (var 30:e minut)
+
+### Tekniskt
+- Använder OffscreenCanvas för dynamisk ikonrendering i MV3 service worker
+- Stöd för 16px, 32px och 48px ikonstorlekar
+- Automatisk fontstorleksanpassning (1–4 tecken, inkl. negativa temperaturer t.ex. "-10°")
+- Fallback till standard-ikon när väder-/UV-data saknas
+
+### Uppdaterade filer
+- `manifest.json` — version 1.3.1
+- `background.js` — ny TOOLBAR_DISPLAY storage key, updateToolbarIcon(), generateToolbarIcon(), färgfunktioner, Beaufort-konvertering, event listeners
+- `popup.html` — nytt radio-group setting-item för toolbar-display
+- `popup.js` — ny storage key, ladda/spara toolbar-display inställning
+- `README.md` / `CHANGELOG.md` — denna post
+
+---
 
 ## Version 1.3.0 – SMHI API-migrering (2026-03-31)
 
