@@ -228,11 +228,33 @@ function getWindColor(beaufort) {
   return '#DC143C';
 }
 
-// Hämta ett parametervärde ur en SMHI-tidsserie
-function getParameterValue(timeSeries, paramName) {
-  if (!timeSeries || !timeSeries.parameters) return null;
-  const param = timeSeries.parameters.find(p => p.name === paramName);
-  return param ? param.values[0] : null;
+// Mappning från gamla PMP3gv2-parameternamn till nya SNOW1gv1-nycklar (identisk med popup.js)
+const PARAM_NAME_MAP = {
+  't': 'air_temperature',
+  'Wsymb2': 'symbol_code',
+  'ws': 'wind_speed',
+  'wd': 'wind_from_direction',
+  'pmedian': 'precipitation_amount_median',
+  'pmin': 'precipitation_amount_min',
+  'r': 'relative_humidity',
+  'tcc_mean': 'cloud_area_fraction'
+};
+
+// Hämta ett parametervärde ur en SMHI SNOW1gv1-tidsserie
+function getParameterValue(weatherData, name) {
+  const newKey = PARAM_NAME_MAP[name];
+  if (!newKey || !weatherData.data) return null;
+  const value = weatherData.data[newKey];
+  return value !== undefined ? value : null;
+}
+
+// Välj badge-textfärg baserat på bakgrundens upplevda ljushet
+function getBadgeTextColor(bgHex) {
+  const r = parseInt(bgHex.slice(1, 3), 16);
+  const g = parseInt(bgHex.slice(3, 5), 16);
+  const b = parseInt(bgHex.slice(5, 7), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 165 ? '#333333' : '#FFFFFF';
 }
 
 // Uppdatera toolbar-badge baserat på TOOLBAR_DISPLAY-inställningen
@@ -286,11 +308,11 @@ async function updateToolbarIcon() {
   } else if (displayMode === 'pressure') {
     const trend = storageResult[STORAGE_KEYS.PRESSURE_TREND];
     if (trend === 'Stigande') {
-      text = '▲';
+      text = '↑';
     } else if (trend === 'Fallande') {
-      text = '▼';
+      text = '↓';
     } else {
-      text = '►';
+      text = '→';
     }
     bgColor = '#5B8DD9';
   }
@@ -299,5 +321,5 @@ async function updateToolbarIcon() {
 
   chrome.action.setBadgeText({ text });
   chrome.action.setBadgeBackgroundColor({ color: bgColor });
-  chrome.action.setBadgeTextColor({ color: '#FFFFFF' });
+  chrome.action.setBadgeTextColor({ color: getBadgeTextColor(bgColor) });
 }
