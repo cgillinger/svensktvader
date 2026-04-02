@@ -235,62 +235,7 @@ function getParameterValue(timeSeries, paramName) {
   return param ? param.values[0] : null;
 }
 
-// Rita text på OffscreenCanvas och returnera ImageData för varje storlek
-function generateToolbarIcon(text, color, sizes = [16, 32, 48]) {
-  const imageDataMap = {};
-
-  for (const size of sizes) {
-    const canvas = new OffscreenCanvas(size, size);
-    const ctx = canvas.getContext('2d');
-
-    ctx.clearRect(0, 0, size, size);
-
-    // Bestäm fontstorlek efter textlängd
-    let fontSize;
-    if (text.length === 1) {
-      fontSize = size * 0.75;
-    } else if (text.length === 2) {
-      fontSize = size * 0.65;
-    } else if (text.length === 3) {
-      fontSize = size * 0.5;
-    } else {
-      fontSize = size * 0.4;  // 4+ tecken, t.ex. "-10°"
-    }
-
-    ctx.font = `bold ${fontSize}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    const cx = size / 2;
-    const cy = size / 2;
-
-    // Svart outline för läsbarhet
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = Math.max(1, size * 0.06);
-    ctx.lineJoin = 'round';
-    ctx.strokeText(text, cx, cy);
-
-    ctx.fillStyle = color;
-    ctx.fillText(text, cx, cy);
-
-    imageDataMap[size] = ctx.getImageData(0, 0, size, size);
-  }
-
-  return imageDataMap;
-}
-
-// Återställ toolbar-ikonen till default
-function restoreDefaultIcon() {
-  chrome.action.setIcon({
-    path: {
-      16: 'icons/icon16.png',
-      48: 'icons/icon48.png',
-      128: 'icons/icon128.png'
-    }
-  });
-}
-
-// Uppdatera toolbar-ikonen baserat på TOOLBAR_DISPLAY-inställningen
+// Uppdatera toolbar-badge baserat på TOOLBAR_DISPLAY-inställningen
 async function updateToolbarIcon() {
   const storageResult = await chrome.storage.local.get([
     STORAGE_KEYS.TOOLBAR_DISPLAY,
@@ -302,42 +247,42 @@ async function updateToolbarIcon() {
   const displayMode = storageResult[STORAGE_KEYS.TOOLBAR_DISPLAY] || 'temp';
 
   if (displayMode === 'none') {
-    restoreDefaultIcon();
+    chrome.action.setBadgeText({ text: '' });
     return;
   }
 
   let text = null;
-  let color = '#FFFFFF';
+  let bgColor = '#888888';
 
   if (displayMode === 'temp' || displayMode === 'wind') {
     const weatherData = storageResult[STORAGE_KEYS.WEATHER_DATA];
     if (!weatherData || !weatherData.timeSeries || weatherData.timeSeries.length === 0) {
-      restoreDefaultIcon();
+      chrome.action.setBadgeText({ text: '' });
       return;
     }
     const currentWeather = weatherData.timeSeries[0];
 
     if (displayMode === 'temp') {
       const temp = getParameterValue(currentWeather, 't');
-      if (temp === null) { restoreDefaultIcon(); return; }
+      if (temp === null) { chrome.action.setBadgeText({ text: '' }); return; }
       text = Math.round(temp) + '°';
-      color = getTempColor(temp);
+      bgColor = getTempColor(temp);
     } else {
       const ws = getParameterValue(currentWeather, 'ws');
-      if (ws === null) { restoreDefaultIcon(); return; }
+      if (ws === null) { chrome.action.setBadgeText({ text: '' }); return; }
       const beaufort = getBeaufortForce(ws);
       text = beaufort.toString();
-      color = getWindColor(beaufort);
+      bgColor = getWindColor(beaufort);
     }
   } else if (displayMode === 'uv') {
     const locationName = storageResult[STORAGE_KEYS.SELECTED_LOCATION_NAME];
-    if (!locationName) { restoreDefaultIcon(); return; }
+    if (!locationName) { chrome.action.setBadgeText({ text: '' }); return; }
     const uvCacheKey = `uv_cache_${locationName}`;
     const uvResult = await chrome.storage.local.get(uvCacheKey);
     const uvData = uvResult[uvCacheKey];
-    if (!uvData || uvData.uvIndex === undefined) { restoreDefaultIcon(); return; }
+    if (!uvData || uvData.uvIndex === undefined) { chrome.action.setBadgeText({ text: '' }); return; }
     text = Math.round(uvData.uvIndex).toString();
-    color = getUVColor(uvData.uvIndex);
+    bgColor = getUVColor(uvData.uvIndex);
   } else if (displayMode === 'pressure') {
     const trend = storageResult[STORAGE_KEYS.PRESSURE_TREND];
     if (trend === 'Stigande') {
@@ -347,44 +292,12 @@ async function updateToolbarIcon() {
     } else {
       text = '►';
     }
-    color = '#FFFFFF';
+    bgColor = '#5B8DD9';
   }
 
-  if (text === null) { restoreDefaultIcon(); return; }
+  if (text === null) { chrome.action.setBadgeText({ text: '' }); return; }
 
-  // Specialhantering för chevron-storlek
-  const isChevron = displayMode === 'pressure';
-  const imageDataMap = {};
-  for (const size of [16, 32, 48]) {
-    const canvas = new OffscreenCanvas(size, size);
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, size, size);
-
-    const fontSize = isChevron ? size * 0.7 : (
-      text.length === 1 ? size * 0.75 :
-      text.length === 2 ? size * 0.65 :
-      text.length === 3 ? size * 0.5 :
-      size * 0.4  // 4+ tecken, t.ex. "-10°"
-    );
-
-    ctx.font = `bold ${fontSize}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = isChevron ? 'alphabetic' : 'middle';
-
-    const cx = size / 2;
-    // Chevrons behöver justeras uppåt något för visuell centrering
-    const cy = isChevron ? size * 0.72 : size / 2;
-
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = Math.max(1, size * 0.06);
-    ctx.lineJoin = 'round';
-    ctx.strokeText(text, cx, cy);
-
-    ctx.fillStyle = color;
-    ctx.fillText(text, cx, cy);
-
-    imageDataMap[size] = ctx.getImageData(0, 0, size, size);
-  }
-
-  chrome.action.setIcon({ imageData: imageDataMap });
+  chrome.action.setBadgeText({ text });
+  chrome.action.setBadgeBackgroundColor({ color: bgColor });
+  chrome.action.setBadgeTextColor({ color: '#FFFFFF' });
 }
