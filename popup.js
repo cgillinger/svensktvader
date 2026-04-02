@@ -20,7 +20,9 @@ const STORAGE_KEYS = {
   CARD_LAYOUT: 'cardLayout',
   // Nycklar för lufttryck
   CURRENT_PRESSURE: 'currentPressure',
-  PRESSURE_TREND: 'pressureTrend'
+  PRESSURE_TREND: 'pressureTrend',
+  // Toolbar badge-display
+  TOOLBAR_DISPLAY: 'toolbarDisplay'
 };
 
 // DOM-element
@@ -149,10 +151,11 @@ function setupEventListeners() {
  */
 function loadSavedSettings() {
   chrome.storage.local.get([
-    STORAGE_KEYS.API_KEY, 
-    STORAGE_KEYS.WIND_SCALE, 
+    STORAGE_KEYS.API_KEY,
+    STORAGE_KEYS.WIND_SCALE,
     STORAGE_KEYS.SHOW_UV_INDEX,
-    STORAGE_KEYS.PRESSURE_UNIT
+    STORAGE_KEYS.PRESSURE_UNIT,
+    STORAGE_KEYS.TOOLBAR_DISPLAY
   ], (result) => {
     // Ladda API-nyckel
     const savedApiKey = result[STORAGE_KEYS.API_KEY];
@@ -176,6 +179,11 @@ function loadSavedSettings() {
     // Ladda UV-index visning (standard: true)
     const showUV = result[STORAGE_KEYS.SHOW_UV_INDEX] !== undefined ? result[STORAGE_KEYS.SHOW_UV_INDEX] : true;
     showUVIndexCheckbox.checked = showUV;
+
+    // Ladda toolbar-display inställning (standard: 'none')
+    const savedToolbarDisplay = result[STORAGE_KEYS.TOOLBAR_DISPLAY] || 'none';
+    const toolbarRadio = document.querySelector(`input[name="toolbar-display"][value="${savedToolbarDisplay}"]`);
+    if (toolbarRadio) toolbarRadio.checked = true;
   });
 }
 
@@ -229,13 +237,17 @@ function saveSettings() {
   
   // Hämta UV-visning inställning
   const showUV = showUVIndexCheckbox.checked;
-  
+
+  // Hämta toolbar-display inställning
+  const selectedToolbarDisplay = document.querySelector('input[name="toolbar-display"]:checked').value;
+
   // Spara inställningar
-  chrome.storage.local.set({ 
+  chrome.storage.local.set({
     [STORAGE_KEYS.API_KEY]: apiKey,
     [STORAGE_KEYS.WIND_SCALE]: selectedWindScale,
     [STORAGE_KEYS.PRESSURE_UNIT]: selectedPressureUnit,
-    [STORAGE_KEYS.SHOW_UV_INDEX]: showUV
+    [STORAGE_KEYS.SHOW_UV_INDEX]: showUV,
+    [STORAGE_KEYS.TOOLBAR_DISPLAY]: selectedToolbarDisplay
   });
   
   // Uppdatera API-nyckelstatus
