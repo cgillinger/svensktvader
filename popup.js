@@ -31,6 +31,7 @@ const selectedLocationName = document.getElementById('selected-location-name');
 const loadingIndicator = document.getElementById('loading-indicator');
 const weatherDisplay = document.getElementById('weather-display');
 const errorMessage = document.getElementById('error-message');
+const welcomeMessage = document.getElementById('welcome-message');
 const currentTempValue = document.getElementById('current-temp-value');
 const currentWeatherIcon = document.getElementById('current-weather-icon');
 const weatherDescription = document.getElementById('weather-description');
@@ -81,24 +82,24 @@ function initializeExtension() {
     
     if (savedLocation) {
       locationSelect.value = savedLocation;
-      
+
       // Visa ortsnamnet
       if (savedLocationName) {
         selectedLocationName.textContent = savedLocationName;
       } else {
-        // Om ingen lagrad ort finns, försök hitta ortsnamnet från koordinaterna
-        const selectedLocationCoords = savedLocation;
-        const locationObj = swedishLocations.find(loc => `${loc.lat},${loc.lon}` === selectedLocationCoords);
+        const locationObj = swedishLocations.find(loc => `${loc.lat},${loc.lon}` === savedLocation);
         if (locationObj) {
           selectedLocationName.textContent = locationObj.name;
-          // Spara ortsnamnet
           chrome.storage.local.set({ [STORAGE_KEYS.SELECTED_LOCATION_NAME]: locationObj.name });
         }
       }
+
+      // Ladda väderdata
+      loadWeatherData();
+    } else {
+      // Ingen plats vald — visa välkomstmeddelande
+      showWelcomeState();
     }
-    
-    // Ladda väderdata
-    loadWeatherData();
   });
   
   // Konfigurera händelselyssnare
@@ -1284,6 +1285,7 @@ function showLoadingState() {
   loadingIndicator.style.display = 'flex';
   weatherDisplay.style.display = 'none';
   errorMessage.style.display = 'none';
+  welcomeMessage.style.display = 'none';
   settingsPanel.style.display = 'none';
 }
 
@@ -1294,6 +1296,7 @@ function showWeatherDisplay() {
   loadingIndicator.style.display = 'none';
   weatherDisplay.style.display = 'block';
   errorMessage.style.display = 'none';
+  welcomeMessage.style.display = 'none';
 }
 
 /**
@@ -1303,7 +1306,18 @@ function showErrorState() {
   loadingIndicator.style.display = 'none';
   weatherDisplay.style.display = 'none';
   errorMessage.style.display = 'flex';
+  welcomeMessage.style.display = 'none';
   settingsPanel.style.display = 'none';
+}
+
+/**
+ * Visar välkomstmeddelande när ingen ort är vald
+ */
+function showWelcomeState() {
+  loadingIndicator.style.display = 'none';
+  weatherDisplay.style.display = 'none';
+  errorMessage.style.display = 'none';
+  welcomeMessage.style.display = 'block';
 }
 
 /**

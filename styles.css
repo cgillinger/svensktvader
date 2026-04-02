@@ -728,6 +728,40 @@ h3 {
   text-shadow: var(--reflective-edge);
 }
 
+/* ===== WELCOME STATE ===== */
+.welcome-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-color);
+}
+
+.welcome-icon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 16px;
+  color: var(--primary-color);
+}
+
+.welcome-message h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 0 12px 0;
+}
+
+.welcome-message p {
+  font-size: 0.95rem;
+  color: var(--light-text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.welcome-arrow {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
 /* ===== FOOTER ===== */
 footer {
   text-align: center;
