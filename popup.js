@@ -17,6 +17,7 @@ const STORAGE_KEYS = {
   WIND_SCALE: 'windScale',
   SHOW_UV_INDEX: 'showUVIndex',
   PRESSURE_UNIT: 'pressureUnit',
+  SHOW_PRESSURE_WORD: 'showPressureWord',
   CARD_LAYOUT: 'cardLayout',
   // Nycklar för lufttryck
   CURRENT_PRESSURE: 'currentPressure',
@@ -45,6 +46,7 @@ const forecastItems = document.getElementById('forecast-items');
 const dailyForecastItems = document.getElementById('daily-forecast-items');
 const lastUpdatedSpan = document.getElementById('last-updated');
 const pressureValue = document.getElementById('pressure-value');
+const pressureWord = document.getElementById('pressure-word');
 const pressureTrend = document.getElementById('pressure-trend');
 const pressureTrendDescription = document.getElementById('pressure-trend-description');
 const pressureTrendIcon = document.getElementById('pressure-trend-icon');
@@ -64,6 +66,7 @@ const saveSettingsButton = document.getElementById('save-settings');
 const windScaleRadios = document.querySelectorAll('input[name="wind-scale"]');
 const pressureUnitRadios = document.querySelectorAll('input[name="pressure-unit"]');
 const showUVIndexCheckbox = document.getElementById('show-uv-index');
+const showPressureWordCheckbox = document.getElementById('show-pressure-word');
 
 // Initialisera tillägget
 document.addEventListener('DOMContentLoaded', initializeExtension);
@@ -156,6 +159,7 @@ function loadSavedSettings() {
     STORAGE_KEYS.WIND_SCALE,
     STORAGE_KEYS.SHOW_UV_INDEX,
     STORAGE_KEYS.PRESSURE_UNIT,
+    STORAGE_KEYS.SHOW_PRESSURE_WORD,
     STORAGE_KEYS.TOOLBAR_DISPLAY
   ], (result) => {
     // Ladda API-nyckel
@@ -176,7 +180,13 @@ function loadSavedSettings() {
     // Ladda tryckenhet
     const savedPressureUnit = result[STORAGE_KEYS.PRESSURE_UNIT] || 'hpa';
     document.querySelector(`input[name="pressure-unit"][value="${savedPressureUnit}"]`).checked = true;
-    
+
+    // Ladda visning av väderord för lufttryck (standard: false)
+    const showPressureWord = result[STORAGE_KEYS.SHOW_PRESSURE_WORD] === true;
+    if (showPressureWordCheckbox) {
+      showPressureWordCheckbox.checked = showPressureWord;
+    }
+
     // Ladda UV-index visning (standard: true)
     const showUV = result[STORAGE_KEYS.SHOW_UV_INDEX] !== undefined ? result[STORAGE_KEYS.SHOW_UV_INDEX] : true;
     showUVIndexCheckbox.checked = showUV;
@@ -235,7 +245,10 @@ function saveSettings() {
   
   // Hämta vald tryckenhet
   const selectedPressureUnit = document.querySelector('input[name="pressure-unit"]:checked').value;
-  
+
+  // Hämta inställning för väderord vid lufttryck
+  const showPressureWord = showPressureWordCheckbox ? showPressureWordCheckbox.checked : false;
+
   // Hämta UV-visning inställning
   const showUV = showUVIndexCheckbox.checked;
 
@@ -247,6 +260,7 @@ function saveSettings() {
     [STORAGE_KEYS.API_KEY]: apiKey,
     [STORAGE_KEYS.WIND_SCALE]: selectedWindScale,
     [STORAGE_KEYS.PRESSURE_UNIT]: selectedPressureUnit,
+    [STORAGE_KEYS.SHOW_PRESSURE_WORD]: showPressureWord,
     [STORAGE_KEYS.SHOW_UV_INDEX]: showUV,
     [STORAGE_KEYS.TOOLBAR_DISPLAY]: selectedToolbarDisplay
   });
@@ -671,6 +685,33 @@ function formatDate(date) {
 }
 
 /**
+ * Beskrivande väderord för lufttrycksnivå, hämtade från en fysisk barometers
+ * urtavla (se pressure-descriptions.md). Beskriver det absoluta värdet, inte
+ * trenden. hPa === mbar, så banden gäller båda. Bandet väljs med hpa < max,
+ * vilket matchar referensimplementationen i specen.
+ */
+const PRESSURE_LEVEL_BANDS = [
+  { max: 980,      word: 'Storm' },
+  { max: 1000,     word: 'Regn' },
+  { max: 1013,     word: 'Ostadigt' },
+  { max: 1040,     word: 'Vackert' },
+  { max: Infinity, word: 'Mycket torrt' }
+];
+
+/**
+ * Returnerar väderordet för ett givet lufttryck.
+ * @param {number} hpa - Tryck i hPa (reducerat till havsytan)
+ * @returns {string} Beskrivande ord, eller tom sträng om värdet saknas
+ */
+function getPressureWord(hpa) {
+  if (hpa === null || hpa === undefined || isNaN(hpa)) {
+    return '';
+  }
+  const band = PRESSURE_LEVEL_BANDS.find(b => hpa < b.max);
+  return band ? band.word : '';
+}
+
+/**
  * Konverterar lufttryck till vald enhet
  * @param {number} hpa - Tryck i hPa
  * @param {string} unit - Enhet (hpa, mbar, mmhg)
@@ -708,20 +749,30 @@ async function updatePressureDisplay(pressureData) {
     container.style.display = 'flex';
   }
   
-  // Hämta vald tryckenhet
+  // Hämta vald tryckenhet och inställning för väderord
   const result = await new Promise((resolve) => {
-    chrome.storage.local.get([STORAGE_KEYS.PRESSURE_UNIT], resolve);
+    chrome.storage.local.get([STORAGE_KEYS.PRESSURE_UNIT, STORAGE_KEYS.SHOW_PRESSURE_WORD], resolve);
   });
   const pressureUnit = result[STORAGE_KEYS.PRESSURE_UNIT] || 'hpa';
-  
+  const showPressureWord = result[STORAGE_KEYS.SHOW_PRESSURE_WORD] === true;
+
   // Formatera tryckvärdet
   const formatted = formatPressure(pressureData.currentPressure, pressureUnit);
-  
+
   // Uppdatera värden
   if (pressureValue) {
     pressureValue.textContent = `${formatted.value} ${formatted.unit}`;
   }
-  
+
+  // Väderord (nivå) ovanför siffran — som urtavlan på en fysisk barometer.
+  // Siffran behålls alltid; ordet är ett tillägg, inte en ersättning.
+  if (pressureWord) {
+    pressureWord.textContent = showPressureWord ? getPressureWord(pressureData.currentPressure) : '';
+  }
+  if (container) {
+    container.classList.toggle('show-word', showPressureWord);
+  }
+
   // Uppdatera med trend och beskrivning på separata rader
   let trendName = '';
   let trendDescription = '';
