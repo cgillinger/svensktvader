@@ -137,6 +137,7 @@
               </div>
               <div class="detail-info">
                 <div class="detail-label">Lufttryck</div>
+                <div class="pressure-word" id="pressure-word"></div>
                 <div class="detail-value" id="pressure-value">-- hPa</div>
               </div>
             </div>
@@ -323,12 +324,19 @@
               Millibar (mbar)
             </label>
             <label class="radio-label">
-              <input type="radio" name="pressure-unit" value="mmhg"> 
+              <input type="radio" name="pressure-unit" value="mmhg">
               Millimeter kvicksilver (mmHg)
             </label>
           </div>
+          <label class="checkbox-label pressure-word-toggle">
+            <input type="checkbox" id="show-pressure-word">
+            <span>Visa väderord (Vackert, Regn, …)</span>
+          </label>
+          <p class="setting-description">
+            Beskriver lufttrycksnivån med ord från en fysisk barometer, ovanför siffran. Trenden visas som vanligt bredvid.
+          </p>
         </div>
-        
+
         <!-- UV-index visning toggle -->
         <div class="setting-item">
           <label class="checkbox-label">

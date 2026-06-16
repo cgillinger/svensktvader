@@ -434,6 +434,27 @@ h3 {
   text-shadow: var(--reflective-edge);
 }
 
+/* Väderord för lufttryck — visas ovanför siffran när inställningen är på.
+   Då blir ordet rubrik och siffran tonas ner till lugn undertext. */
+.pressure-word {
+  display: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-color);
+  text-shadow: var(--reflective-edge);
+  margin-bottom: 2px;
+}
+
+.pressure-detail.show-word .pressure-word {
+  display: block;
+}
+
+.pressure-detail.show-word .detail-value {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--light-text);
+}
+
 /* ===== SOLUPPGÅNG/SOLNEDGÅNG ===== */
 .sun-times {
   grid-column: span 2;
@@ -1023,6 +1044,11 @@ footer::before {
 
 .checkbox-label span {
   user-select: none;
+}
+
+/* Lite luft mellan tryckenhets-radioknapparna och väderords-kryssrutan */
+.pressure-word-toggle {
+  margin-top: 12px;
 }
 
 /* ===== ATTRIBUTION BOX ===== */

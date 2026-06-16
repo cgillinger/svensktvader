@@ -1,4 +1,26 @@
-# CHANGELOG - Version 1.3.1
+# CHANGELOG - Version 1.4.0
+
+## Version 1.4.0 – Väderord för lufttryck (2026-06-16)
+
+### Ny funktion
+- **Beskrivande väderord för lufttryck:** Visa lufttrycksnivån med ord från en fysisk barometers urtavla (Storm · Regn · Ostadigt · Vackert · Mycket torrt) i stället för att bara läsa av siffran
+- Aktiveras via ny kryssruta "Visa väderord" i inställningarna (av som standard)
+- Ordet visas som rubrik ovanför tryckvärdet — siffran behålls alltid, ordet är ett tillägg
+- Trenden (Stigande/Fallande/Stabilt) visas oförändrat bredvid, så nivå och tendens syns parallellt precis som på en riktig barometer
+
+### Tekniskt
+- Nivåband enligt `pressure-descriptions.md`, valda med `hPa < max` (matchar referensimplementationen i specen)
+- hPa === mbar, så banden gäller båda; ordet beräknas alltid från havsnivåreducerat tryck (SMHI-parameter 9), oberoende av vald visningsenhet
+- Ordet och nedtonad siffra styrs av CSS-klassen `.pressure-detail.show-word`
+
+### Uppdaterade filer
+- `manifest.json` — version 1.4.0
+- `popup.html` — nytt `#pressure-word`-element i lufttryckspanelen samt kryssruta `#show-pressure-word` i inställningarna
+- `popup.js` — ny storage key `SHOW_PRESSURE_WORD`, `getPressureWord()` + `PRESSURE_LEVEL_BANDS`, ladda/spara inställning, rendering i `updatePressureDisplay()`
+- `styles.css` — stilar för `.pressure-word` och nedtonad siffra i `show-word`-läge
+- `README.md` / `CHANGELOG.md` — denna post
+
+---
 
 ## Version 1.3.1 – Toolbar badge-display (2026-04-02)
 

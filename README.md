@@ -72,6 +72,7 @@ Tillägget visar nederbörd för kommande 2 timmar när regn, snö eller snöbla
 - **Plats:** Välj ort från listan (sparas automatiskt)
 - **Soldata API-nyckel:** Valfri nyckel från [ipgeolocation.io](https://ipgeolocation.io/) för exakta soltider
 - **Vindskala:** Välj mellan m/s, Beaufort (0–12) eller beskrivande termer
+- **Lufttryck:** Välj enhet (hPa, mbar, mmHg) och om nivån ska visas som väderord (Vackert, Regn, …)
 - **UV-index:** Toggle för att visa/dölja UV-data
 
 ---
@@ -109,6 +110,24 @@ Lufttryck visas i hPa med trend baserat på senaste timmen:
 
 Data hämtas från närmaste SMHI-station, vilket kan vara några kilometer från vald ort.
 
+### Väderord (valfritt)
+
+För den som saknar känsla för siffervärden kan lufttrycksnivån visas med ord från
+en fysisk barometers urtavla. Aktiveras under inställningar (av som standard).
+Siffran behålls alltid och trenden visas bredvid — nivå och tendens syns parallellt
+precis som på en riktig barometer.
+
+| Väderord | hPa / mbar |
+|---|---|
+| Storm | < 980 |
+| Regn | 980–1000 |
+| Ostadigt | 1000–1013 |
+| Vackert | 1013–1040 |
+| Mycket torrt | > 1040 |
+
+> Orden är medvetet grova och ska inte läsas som en prognos. Absolut tryck förutsäger
+> väder dåligt på egen hand — titta på orden och trenden tillsammans.
+
 ---
 
 ## Projektstruktur
@@ -137,6 +156,12 @@ svensktvader/
 ---
 
 ## Changelog
+
+### Version 1.4.0
+**Ny funktion:**
+- Beskrivande väderord för lufttryck (Storm · Regn · Ostadigt · Vackert · Mycket torrt)
+- Aktiveras via kryssruta i inställningarna (av som standard)
+- Ordet visas ovanför siffran; trenden visas oförändrat bredvid
 
 ### Version 1.3.1
 **Ny funktion:**
