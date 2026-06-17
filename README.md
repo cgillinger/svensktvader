@@ -149,13 +149,17 @@ svensktvader/
 
 ## Ikoner och licenser
 
-- **Weather Icons** av [Erik Flowers](https://github.com/erikflowers/weather-icons) – SIL OFL 1.1
-- **SVG Weather Icons** av [amCharts](https://www.amcharts.com/free-animated-svg-weather-icons/) – CC BY 4.0
+- **Weather Icons 2.0.10** av [Erik Flowers](https://github.com/erikflowers/weather-icons) – teckensnitt SIL OFL 1.1, CSS MIT
+- **Font Awesome Free 5.15.4** av [@fontawesome](https://fontawesome.com) – ikoner CC BY 4.0, teckensnitt SIL OFL 1.1, kod MIT ([licens](https://fontawesome.com/license/free))
 - **UV-data** från [CurrentUVIndex.com](https://currentuvindex.com/) – CC BY 4.0
 
 ---
 
 ## Changelog
+
+### Version 1.4.3
+**Attribution:**
+- Korrekt licensattribution för bundlat material; tar bort oanvänd amCharts-kredit (animerade SVG-ikoner används inte längre)
 
 ### Version 1.4.2
 **Optimering:**

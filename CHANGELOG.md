@@ -1,4 +1,17 @@
-# CHANGELOG - Version 1.4.2
+# CHANGELOG - Version 1.4.3
+
+## Version 1.4.3 – Korrekt attribution (2026-06-17)
+
+### Attribution
+- Tar bort amCharts-krediten — de animerade SVG-väderikonerna används inte längre (alla väderikoner ritas med Weather Icons-fonten)
+- Förtydligar Font Awesome-krediten: ikoner CC BY 4.0, teckensnitt SIL OFL 1.1, kod MIT (+ licenslänk)
+- Förtydligar Weather Icons-krediten: teckensnitt SIL OFL 1.1, CSS MIT
+
+### Uppdaterade filer
+- `popup.html` / `README.md` — attribution
+- `manifest.json` — version 1.4.3
+
+---
 
 ## Version 1.4.2 – Lokal Font Awesome (2026-06-17)
 
