@@ -1,4 +1,23 @@
-# CHANGELOG - Version 1.4.1
+# CHANGELOG - Version 1.4.2
+
+## Version 1.4.2 – Lokal Font Awesome (2026-06-17)
+
+### Optimering
+- **Font Awesome buntas nu lokalt** i stället för att hämtas från cloudflare-CDN. Tar bort det enda kvarvarande fjärrberoendet i popupen — ikonerna fungerar nu offline och paketet uppfyller MV3:s linje om inga fjärrhämtade resurser bättre.
+- Endast solid-stilen (`fas`) används, så enbart `fa-solid-900.woff2` (~78 kB) bundlas; övriga format/stilar utelämnas.
+
+### Tekniskt
+- Nya `font-awesome/css/all.min.css` + `font-awesome/webfonts/fa-solid-900.woff2` (Font Awesome Free 5.15.4)
+- `popup.html` — `<link>` pekar nu på den lokala sökvägen
+- Attribution för Font Awesome tillagd i inställningarna
+
+### Uppdaterade filer
+- `manifest.json` — version 1.4.2
+- `popup.html` — lokal CSS-länk + attribution
+- `font-awesome/` — nya, lokalt bundlade resurser
+- `README.md` / `CHANGELOG.md` — denna post
+
+---
 
 ## Version 1.4.1 – Direktväxling + källhänvisning för väderord (2026-06-17)
 

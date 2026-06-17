@@ -157,6 +157,10 @@ svensktvader/
 
 ## Changelog
 
+### Version 1.4.2
+**Optimering:**
+- Font Awesome buntas lokalt i stället för via CDN — inga fjärrhämtade resurser, ikoner fungerar offline
+
 ### Version 1.4.1
 **Buggfix:**
 - Väderorden visas nu direkt när kryssrutan ändras (ingen Spara-knapp eller väderhämtning krävs)
