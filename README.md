@@ -157,6 +157,13 @@ svensktvader/
 
 ## Changelog
 
+### Version 1.4.1
+**Buggfix:**
+- Väderorden visas nu direkt när kryssrutan ändras (ingen Spara-knapp eller väderhämtning krävs)
+
+**Ny funktion:**
+- Källhänvisning för väderorden längst ner i inställningarna (Huger precisionsbarometer)
+
 ### Version 1.4.0
 **Ny funktion:**
 - Beskrivande väderord för lufttryck (Storm · Regn · Ostadigt · Vackert · Mycket torrt)

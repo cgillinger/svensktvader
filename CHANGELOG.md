@@ -1,4 +1,24 @@
-# CHANGELOG - Version 1.4.0
+# CHANGELOG - Version 1.4.1
+
+## Version 1.4.1 – Direktväxling + källhänvisning för väderord (2026-06-17)
+
+### Buggfix
+- **Väderorden visas nu direkt när kryssrutan "Visa väderord" ändras** — tidigare krävdes att man tryckte Spara och att en ny väderhämtning hann slutföras innan ordet dök upp. Växlingen sker nu lokalt och omedelbart, från senast sparade tryck.
+
+### Ny funktion
+- Källhänvisning för väderorden i attributionssektionen längst ner i inställningarna (Huger precisionsbarometer)
+
+### Tekniskt
+- Ny `applyPressureWordSetting()` + `change`-lyssnare på `#show-pressure-word`; värdet sparas direkt till `chrome.storage.local`
+- Påminnelse: ett uppackat tillägg måste laddas om i `edge://extensions` (↻) efter att filer ändrats — annars körs den gamla popupen
+
+### Uppdaterade filer
+- `manifest.json` — version 1.4.1
+- `popup.js` — `applyPressureWordSetting()`, direktväxling via `change`-händelse
+- `popup.html` — källhänvisning i attributionssektionen
+- `README.md` / `CHANGELOG.md` — denna post
+
+---
 
 ## Version 1.4.0 – Väderord för lufttryck (2026-06-16)
 
