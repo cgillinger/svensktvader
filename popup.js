@@ -142,7 +142,17 @@ function setupEventListeners() {
   
   // Ändring av ortsväljar-händelse (nu bara i inställningar)
   locationSelect.addEventListener('change', handleLocationChange);
-  
+
+  // Väderord för lufttryck: växla direkt när kryssrutan ändras, utan att
+  // behöva trycka Spara eller vänta på nästa väderhämtning.
+  if (showPressureWordCheckbox) {
+    showPressureWordCheckbox.addEventListener('change', () => {
+      const show = showPressureWordCheckbox.checked;
+      chrome.storage.local.set({ [STORAGE_KEYS.SHOW_PRESSURE_WORD]: show });
+      applyPressureWordSetting(show);
+    });
+  }
+
   // Ladda sparade inställningar
   loadSavedSettings();
   
@@ -809,6 +819,26 @@ async function updatePressureDisplay(pressureData) {
   if (pressureTrendIcon) {
     updatePressureTrendIcon(pressureData.pressureTrend);
   }
+}
+
+/**
+ * Visar eller döljer väderordet direkt, från senast sparade tryck, utan att
+ * vänta på nästa väderhämtning. Används när kryssrutan växlas i inställningarna.
+ * @param {boolean} show - Om väderordet ska visas
+ */
+function applyPressureWordSetting(show) {
+  const container = document.querySelector('.pressure-detail');
+  if (container) {
+    container.classList.toggle('show-word', show);
+  }
+  chrome.storage.local.get([STORAGE_KEYS.CURRENT_PRESSURE], (result) => {
+    const hpa = result[STORAGE_KEYS.CURRENT_PRESSURE];
+    if (pressureWord) {
+      pressureWord.textContent = (show && hpa !== null && hpa !== undefined)
+        ? getPressureWord(hpa)
+        : '';
+    }
+  });
 }
 
 /**
